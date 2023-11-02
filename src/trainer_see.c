@@ -26,7 +26,6 @@ static u8 CheckPathBetweenTrainerAndPlayer(struct ObjectEvent *trainerObj, u8 ap
 static void InitTrainerApproachTask(struct ObjectEvent *trainerObj, u8 range);
 static void Task_RunTrainerSeeFuncList(u8 taskId);
 static void Task_EndTrainerApproach(u8 taskId);
-static void SetIconSpriteData(struct Sprite *sprite, u16 fldEffId, u8 spriteAnimNum);
 
 static u8 GetTrainerApproachDistanceSouth(struct ObjectEvent *trainerObj, s16 range, s16 x, s16 y);
 static u8 GetTrainerApproachDistanceNorth(struct ObjectEvent *trainerObj, s16 range, s16 x, s16 y);
@@ -59,9 +58,11 @@ bool8 gTrainerApproachedPlayer;
 EWRAM_DATA u8 gApproachingTrainerId = 0;
 
 // const rom data
-static const u8 sEmotion_ExclamationMarkGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_exclamation.4bpp");
-static const u8 sEmotion_QuestionMarkGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_question.4bpp");
-static const u8 sEmotion_HeartGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_heart.4bpp");
+static const u8 sEmoticons[][0x80] = {
+    INCBIN_U8("graphics/field_effects/pics/emotion_exclamation.4bpp"),
+    INCBIN_U8("graphics/field_effects/pics/emotion_question.4bpp"),
+    INCBIN_U8("graphics/field_effects/pics/emotion_heart.4bpp"),
+};
 
 static u8 (*const sDirectionalApproachDistanceFuncs[])(struct ObjectEvent *trainerObj, s16 range, s16 x, s16 y) =
 {
@@ -127,62 +128,38 @@ static const struct OamData sOamData_Icons =
     .affineParam = 0,
 };
 
-static const struct SpriteFrameImage sSpriteImageTable_ExclamationQuestionMark[] =
+#define ICON_SIZE 128
+static const struct SpriteFrameImage sSpriteImageTable_EmoteIcon[] =
 {
-    {
-        .data = sEmotion_ExclamationMarkGfx,
-        .size = sizeof(sEmotion_ExclamationMarkGfx)
-    },
-    {
-        .data = sEmotion_QuestionMarkGfx,
-        .size = sizeof(sEmotion_QuestionMarkGfx)
-    }
+    [ICON_EXCLAMATION] = { (u8 *)sEmoticons + ICON_EXCLAMATION * ICON_SIZE, ICON_SIZE },
+    [ICON_QUESTION]    = { (u8 *)sEmoticons + ICON_QUESTION * ICON_SIZE, ICON_SIZE },
+    [ICON_HEART]       = { (u8 *)sEmoticons + ICON_HEART * ICON_SIZE, ICON_SIZE },
 };
 
-static const struct SpriteFrameImage sSpriteImageTable_HeartIcon[] =
-{
-    {
-        .data = sEmotion_HeartGfx,
-        .size = sizeof(sEmotion_HeartGfx)
-    }
-};
+#define EMOTE_FRAME(num)\
+{\
+    ANIMCMD_FRAME(num, 60),\
+    ANIMCMD_END\
+}
 
-static const union AnimCmd sSpriteAnim_Icons1[] =
-{
-    ANIMCMD_FRAME(0, 60),
-    ANIMCMD_END
-};
-
-static const union AnimCmd sSpriteAnim_Icons2[] =
-{
-    ANIMCMD_FRAME(1, 60),
-    ANIMCMD_END
-};
+static const union AnimCmd sSpriteAnim_IconExclamation[] = EMOTE_FRAME(ICON_EXCLAMATION);
+static const union AnimCmd sSpriteAnim_IconQuestion[] = EMOTE_FRAME(ICON_QUESTION);
+static const union AnimCmd sSpriteAnim_IconHeart[] = EMOTE_FRAME(ICON_HEART);
 
 static const union AnimCmd *const sSpriteAnimTable_Icons[] =
 {
-    sSpriteAnim_Icons1,
-    sSpriteAnim_Icons2
+    [ICON_EXCLAMATION] = sSpriteAnim_IconExclamation,
+    [ICON_QUESTION]    = sSpriteAnim_IconQuestion,
+    [ICON_HEART]       = sSpriteAnim_IconHeart,
 };
 
-static const struct SpriteTemplate sSpriteTemplate_ExclamationQuestionMark =
+static const struct SpriteTemplate sSpriteTemplate_EmoteIcons =
 {
     .tileTag = TAG_NONE,
     .paletteTag = TAG_NONE,
     .oam = &sOamData_Icons,
     .anims = sSpriteAnimTable_Icons,
-    .images = sSpriteImageTable_ExclamationQuestionMark,
-    .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCB_TrainerIcons
-};
-
-static const struct SpriteTemplate sSpriteTemplate_HeartIcon =
-{
-    .tileTag = TAG_NONE,
-    .paletteTag = FLDEFF_PAL_TAG_GENERAL_0,
-    .oam = &sOamData_Icons,
-    .anims = sSpriteAnimTable_Icons,
-    .images = sSpriteImageTable_HeartIcon,
+    .images = sSpriteImageTable_EmoteIcon,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCB_TrainerIcons
 };
@@ -461,7 +438,8 @@ static bool8 TrainerExclamationMark(u8 taskId, struct Task *task, struct ObjectE
     u8 direction;
 
     ObjectEventGetLocalIdAndMap(trainerObj, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
-    FieldEffectStart(FLDEFF_EXCLAMATION_MARK_ICON);
+    gFieldEffectArguments[3] = ICON_EXCLAMATION;
+    FieldEffectStart(FLDEFF_EMOTE_ICON);
     direction = GetFaceDirectionMovementAction(trainerObj->facingDirection);
     ObjectEventSetHeldMovement(trainerObj, direction);
     task->tFuncId++; // TRSEE_EXCLAMATION_WAIT
@@ -471,7 +449,7 @@ static bool8 TrainerExclamationMark(u8 taskId, struct Task *task, struct ObjectE
 // TRSEE_EXCLAMATION_WAIT
 static bool8 WaitTrainerExclamationMark(u8 taskId, struct Task *task, struct ObjectEvent *trainerObj)
 {
-    if (FieldEffectActiveListContains(FLDEFF_EXCLAMATION_MARK_ICON))
+    if (FieldEffectActiveListContains(FLDEFF_EMOTE_ICON))
     {
         return FALSE;
     }
@@ -693,42 +671,7 @@ void TryPrepareSecondApproachingTrainer(void)
 #define sYOffset    data[4]
 #define sFldEffId   data[7]
 
-u8 FldEff_ExclamationMarkIcon(void)
-{
-    u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_ExclamationQuestionMark, 0, 0, 0x53);
-
-    if (spriteId != MAX_SPRITES)
-        SetIconSpriteData(&gSprites[spriteId], FLDEFF_EXCLAMATION_MARK_ICON, 0);
-
-    return 0;
-}
-
-u8 FldEff_QuestionMarkIcon(void)
-{
-    u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_ExclamationQuestionMark, 0, 0, 0x52);
-
-    if (spriteId != MAX_SPRITES)
-        SetIconSpriteData(&gSprites[spriteId], FLDEFF_QUESTION_MARK_ICON, 1);
-
-    return 0;
-}
-
-u8 FldEff_HeartIcon(void)
-{
-    u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_HeartIcon, 0, 0, 0x52);
-
-    if (spriteId != MAX_SPRITES)
-    {
-        struct Sprite *sprite = &gSprites[spriteId];
-
-        SetIconSpriteData(sprite, FLDEFF_HEART_ICON, 0);
-        sprite->oam.paletteNum = 2;
-    }
-
-    return 0;
-}
-
-static void SetIconSpriteData(struct Sprite *sprite, u16 fldEffId, u8 spriteAnimNum)
+static void SetIconSpriteData(struct Sprite *sprite)
 {
     sprite->oam.priority = 1;
     sprite->coordOffsetEnabled = 1;
@@ -737,9 +680,27 @@ static void SetIconSpriteData(struct Sprite *sprite, u16 fldEffId, u8 spriteAnim
     sprite->sMapNum = gFieldEffectArguments[1];
     sprite->sMapGroup = gFieldEffectArguments[2];
     sprite->sYVelocity = -5;
-    sprite->sFldEffId = fldEffId;
+    sprite->sFldEffId = FLDEFF_EMOTE_ICON;
 
-    StartSpriteAnim(sprite, spriteAnimNum);
+    if (gFieldEffectArguments[3] >= ARRAY_COUNT(sSpriteAnimTable_Icons))
+        StartSpriteAnim(sprite, ICON_EXCLAMATION);
+    else
+        StartSpriteAnim(sprite, gFieldEffectArguments[3]);
+}
+
+u8 FldEff_EmoteIcon(void)
+{
+    u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_EmoteIcons, 0, 0, 0x52);
+
+    if (spriteId != MAX_SPRITES)
+    {
+        struct Sprite *sprite = &gSprites[spriteId];
+        // LoadObjectEventPalette(0x1100); // OBJ_EVENT_PAL_TAG_BRENDAN, uncomment this if you're using dynamic overworld palettes
+        SetIconSpriteData(sprite);
+        sprite->oam.paletteNum = 2; //! delete this if you're using dynamic overworld palettes
+    }
+
+    return 0;
 }
 
 static void SpriteCB_TrainerIcons(struct Sprite *sprite)
