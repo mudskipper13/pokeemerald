@@ -13,6 +13,7 @@
 #include "field_poison.h"
 #include "field_screen_effect.h"
 #include "field_specials.h"
+#include "field_weather.h"
 #include "fldeff_misc.h"
 #include "item_menu.h"
 #include "link.h"
@@ -28,6 +29,7 @@
 #include "trainer_see.h"
 #include "trainer_hill.h"
 #include "wild_encounter.h"
+#include "outfit_menu.h"
 #include "constants/event_bg.h"
 #include "constants/event_objects.h"
 #include "constants/field_poison.h"
@@ -129,6 +131,11 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
         input->dpadDirection = DIR_WEST;
     else if (heldKeys & DPAD_RIGHT)
         input->dpadDirection = DIR_EAST;
+
+    if ((heldKeys & L_BUTTON))
+    {
+        input->input_field_1_0 = TRUE;
+    }
 }
 
 int ProcessPlayerFieldInput(struct FieldInput *input)
@@ -187,6 +194,15 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     }
     if (input->pressedSelectButton && UseRegisteredKeyItemOnField() == TRUE)
         return TRUE;
+
+    if (input->input_field_1_0)
+    {
+        FreezeObjectEvents();
+        PlayerFreeze();
+        StopPlayerAvatar();
+        FadeScreen(FADE_TO_BLACK, 0);
+        CreateTask(Task_OpenOutfitMenu, 0x20);
+    }
 
     return FALSE;
 }

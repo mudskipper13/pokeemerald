@@ -25,6 +25,7 @@
 #include "battle_pyramid.h"
 #include "overworld.h"
 #include "math_util.h"
+#include "data.h"
 #include "constants/battle_frontier.h"
 #include "constants/rgb.h"
 #include "constants/region_map_sections.h"

@@ -20,6 +20,7 @@
 #include "task.h"
 #include "trig.h"
 #include "util.h"
+#include "data.h"
 #include "constants/field_effects.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
