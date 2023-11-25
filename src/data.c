@@ -328,4 +328,3 @@ const union AnimCmd *const gAnims_MonPic[MAX_MON_PIC_FRAMES] =
 #include "data/text/move_names.h"
 
 #include "data/outfit_tables.h"
-#include "data/text/outfits.h"

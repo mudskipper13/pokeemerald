@@ -352,7 +352,7 @@ static void SafariHandleReturnMonToBall(void)
 
 static void SafariHandleDrawTrainerPic(void)
 {
-    u16 picId = gOutfitBackPics[gSaveBlock2Ptr->currOutfitId][gSaveBlock2Ptr->playerGender];
+    u16 picId = gOutfits[gSaveBlock2Ptr->currOutfitId].trainerPics[gSaveBlock2Ptr->playerGender][1];
 
     DecompressTrainerBackPic(picId, gActiveBattler);
     SetMultiuseSpriteTemplateToTrainerBack(picId, GetBattlerPosition(gActiveBattler));
