@@ -62,6 +62,7 @@ static const u8 sEmoticons[][0x80] = {
     INCBIN_U8("graphics/field_effects/pics/emotion_exclamation.4bpp"),
     INCBIN_U8("graphics/field_effects/pics/emotion_question.4bpp"),
     INCBIN_U8("graphics/field_effects/pics/emotion_heart.4bpp"),
+    INCBIN_U8("graphics/field_effects/pics/emotion_dots.4bpp"),
 };
 
 static u8 (*const sDirectionalApproachDistanceFuncs[])(struct ObjectEvent *trainerObj, s16 range, s16 x, s16 y) =
@@ -134,6 +135,7 @@ static const struct SpriteFrameImage sSpriteImageTable_EmoteIcon[] =
     [ICON_EXCLAMATION] = { (u8 *)sEmoticons + ICON_EXCLAMATION * ICON_SIZE, ICON_SIZE },
     [ICON_QUESTION]    = { (u8 *)sEmoticons + ICON_QUESTION * ICON_SIZE, ICON_SIZE },
     [ICON_HEART]       = { (u8 *)sEmoticons + ICON_HEART * ICON_SIZE, ICON_SIZE },
+    [ICON_DOTS]        = { (u8 *)sEmoticons + ICON_DOTS * ICON_SIZE, ICON_SIZE },
 };
 
 #define EMOTE_FRAME(num)\
@@ -145,12 +147,14 @@ static const struct SpriteFrameImage sSpriteImageTable_EmoteIcon[] =
 static const union AnimCmd sSpriteAnim_IconExclamation[] = EMOTE_FRAME(ICON_EXCLAMATION);
 static const union AnimCmd sSpriteAnim_IconQuestion[] = EMOTE_FRAME(ICON_QUESTION);
 static const union AnimCmd sSpriteAnim_IconHeart[] = EMOTE_FRAME(ICON_HEART);
+static const union AnimCmd sSpriteAnim_IconDots[] = EMOTE_FRAME(ICON_DOTS);
 
 static const union AnimCmd *const sSpriteAnimTable_Icons[] =
 {
     [ICON_EXCLAMATION] = sSpriteAnim_IconExclamation,
     [ICON_QUESTION]    = sSpriteAnim_IconQuestion,
     [ICON_HEART]       = sSpriteAnim_IconHeart,
+    [ICON_DOTS]        = sSpriteAnim_IconDots,
 };
 
 static const struct SpriteTemplate sSpriteTemplate_EmoteIcons =
