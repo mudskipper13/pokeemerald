@@ -335,6 +335,8 @@ static void InitLocalLinkPlayer(void)
     {
         gLocalLinkPlayer.progressFlags |= 0x10;
     }
+    gLocalLinkPlayer.currOutfitId = gSaveBlock2Ptr->currOutfitId;
+    gLocalLinkPlayer.hasOutfit = TRUE;
 }
 
 static void VBlankCB_LinkError(void)
@@ -605,7 +607,6 @@ static void ProcessRecvCmds(u8 unused)
                         if ((linkPlayer->version & 0xFF) == VERSION_RUBY || (linkPlayer->version & 0xFF) == VERSION_SAPPHIRE)
                         {
                             linkPlayer->progressFlagsCopy = 0;
-                            linkPlayer->neverRead = 0;
                             linkPlayer->progressFlags = 0;
                         }
                         ConvertLinkPlayerName(linkPlayer);

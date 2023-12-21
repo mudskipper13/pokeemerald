@@ -1252,7 +1252,15 @@ static void LinkOpponentHandleDrawTrainerPic(void)
             }
             else
             {
-                trainerPicId = PlayerGenderToFrontTrainerPicId(gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].gender);
+                //! neverRead was set to 0 by vanilla, we use it to our
+                //! advantage so that our game won't freak out as much
+                //! we also defaults to 0 if the player has an outfit
+                //! our game don't
+                u8 outfit = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].currOutfitId, gender = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].gender;
+                if (gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].hasOutfit && outfit < OUTFIT_COUNT)
+                    trainerPicId = gOutfits[outfit].trainerPics[gender][0];
+                else
+                    trainerPicId = PlayerGenderToFrontTrainerPicId(gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].gender);
             }
         }
     }
@@ -1281,7 +1289,15 @@ static void LinkOpponentHandleDrawTrainerPic(void)
         }
         else
         {
-            trainerPicId = PlayerGenderToFrontTrainerPicId(gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].gender);
+            //! neverRead was set to 0 by vanilla, we use it to our
+            //! advantage so that our game won't freak out as much
+            //! we also defaults to 0 if the player has an outfit
+            //! our game don't
+            u8 outfit = gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].currOutfitId, gender = gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].gender;
+            if (gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].hasOutfit && outfit < OUTFIT_COUNT)
+                trainerPicId = gOutfits[outfit].trainerPics[gender][0];
+            else
+                trainerPicId = PlayerGenderToFrontTrainerPicId(gender);
         }
     }
 

@@ -1135,7 +1135,11 @@ static void LinkPartnerHandleDrawTrainerPic(void)
     }
     else
     {
-        trainerPicId = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].gender;
+        u8 outfit = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].currOutfitId, gender = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].gender;
+        if (gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].hasOutfit && outfit < OUTFIT_COUNT)
+            trainerPicId = gOutfits[outfit].trainerPics[gender][0];
+        else
+            trainerPicId = gender;
     }
 
     DecompressTrainerBackPic(trainerPicId, gActiveBattler);
