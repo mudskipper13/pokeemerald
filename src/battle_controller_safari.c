@@ -20,6 +20,7 @@
 #include "text.h"
 #include "util.h"
 #include "window.h"
+#include "outfit_menu.h"
 #include "constants/battle_anim.h"
 #include "constants/songs.h"
 #include "constants/rgb.h"
@@ -352,7 +353,7 @@ static void SafariHandleReturnMonToBall(void)
 
 static void SafariHandleDrawTrainerPic(void)
 {
-    u16 picId = gOutfits[gSaveBlock2Ptr->currOutfitId].trainerPics[gSaveBlock2Ptr->playerGender][1];
+    u16 picId = GetPlayerTrainerPicIdByOutfitGenderType(gSaveBlock2Ptr->currOutfitId, gSaveBlock2Ptr->playerGender, 1);
 
     DecompressTrainerBackPic(picId, gActiveBattler);
     SetMultiuseSpriteTemplateToTrainerBack(picId, GetBattlerPosition(gActiveBattler));

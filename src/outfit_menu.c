@@ -473,7 +473,7 @@ static inline void CreateOutfitSwitchArrowPair(void)
 
 static inline void SetupOutfitMenu_Sprites_DrawOverworldSprite(bool32 update, bool32 locked)
 {
-    u16 gfxId = gOutfits[sOutfitMenu->idx].avatarGfxIds[gSaveBlock2Ptr->playerGender][PLAYER_AVATAR_STATE_NORMAL];
+    u16 gfxId = GetPlayerAvatarGraphicsIdByOutfitStateIdAndGender(sOutfitMenu->idx, PLAYER_AVATAR_STATE_NORMAL, gSaveBlock2Ptr->playerGender);
 
     if (update)
         DestroySprite(&gSprites[sOutfitMenu->spriteIds[GFX_OW]]);
@@ -484,7 +484,7 @@ static inline void SetupOutfitMenu_Sprites_DrawOverworldSprite(bool32 update, bo
 
 static inline void SetupOutfitMenu_Sprites_DrawTrainerSprite(bool32 update, bool32 locked)
 {
-    u16 id = gOutfits[sOutfitMenu->idx].trainerPics[gSaveBlock2Ptr->playerGender][0];
+    u16 id = GetPlayerTrainerPicIdByOutfitGenderType(sOutfitMenu->idx, gSaveBlock2Ptr->playerGender, 0);
     if (update)
         FreeAndDestroyTrainerPicSprite(sOutfitMenu->spriteIds[GFX_TS]);
 
@@ -639,7 +639,6 @@ static void Task_OutfitMenuHandleInput(u8 taskId)
             sOutfitMenu->idx = OUTFIT_BEGIN;
 
         UpdateOutfitInfo();
-        DebugPrintf("DPAD_RIGHT, sOutfitMenu->idx = %d", sOutfitMenu->idx);
     }
 
     if (JOY_NEW(DPAD_LEFT))
@@ -650,7 +649,6 @@ static void Task_OutfitMenuHandleInput(u8 taskId)
             sOutfitMenu->idx = OUTFIT_END;
 
         UpdateOutfitInfo();
-        DebugPrintf("DPAD_LEFT, sOutfitMenu->idx = %d", sOutfitMenu->idx);
     }
 
     if (JOY_NEW(PICK_BUTTONS))
@@ -679,7 +677,7 @@ static void Task_CloseOutfitMenu(u8 taskId)
     }
 }
 
-//! misc funcs for scripting
+//! misc funcs
 
 void UnlockOutfit(u8 outfitId)
 {
@@ -718,4 +716,35 @@ void BufferOutfitStrings(u8 *dest, u8 outfitId, u8 dataType)
         break;
     }
     StringCopy(dest, src);
+}
+
+u32 GetPlayerTrainerPicIdByOutfitGenderType(u32 outfitId, u32 gender, bool32 type)
+{
+    if (outfitId < OUTFIT_COUNT)
+        return gOutfits[outfitId].trainerPics[gender][type];
+    else
+        return gOutfits[0].trainerPics[gender][type];
+}
+
+const u16 *GetPlayerBattleTransitionMugshotPalette(void)
+{
+    return gOutfits[gSaveBlock2Ptr->currOutfitId].mugshotPals[gSaveBlock2Ptr->playerGender];
+}
+
+const void *GetPlayerHeadGfxOrPal(u8 which, bool32 isFP)
+{
+    if (isFP)
+    {
+        if (which == GFX)
+            return gOutfits[gSaveBlock2Ptr->currOutfitId].iconsFP[gSaveBlock2Ptr->playerGender][GFX];
+        else
+            return gOutfits[gSaveBlock2Ptr->currOutfitId].iconsFP[gSaveBlock2Ptr->playerGender][PAL];
+    }
+    else
+    {
+        if (which == GFX)
+            return gOutfits[gSaveBlock2Ptr->currOutfitId].iconsRM[gSaveBlock2Ptr->playerGender][GFX];
+        else
+            return gOutfits[gSaveBlock2Ptr->currOutfitId].iconsRM[gSaveBlock2Ptr->playerGender][PAL];
+    }
 }

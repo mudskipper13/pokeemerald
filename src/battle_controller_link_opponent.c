@@ -24,6 +24,7 @@
 #include "text.h"
 #include "util.h"
 #include "window.h"
+#include "outfit_menu.h"
 #include "constants/battle_anim.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
@@ -1256,9 +1257,11 @@ static void LinkOpponentHandleDrawTrainerPic(void)
                 //! advantage so that our game won't freak out as much
                 //! we also defaults to 0 if the player has an outfit
                 //! our game don't
-                u8 outfit = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].currOutfitId, gender = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].gender;
-                if (gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].hasOutfit && outfit < OUTFIT_COUNT)
-                    trainerPicId = gOutfits[outfit].trainerPics[gender][0];
+                u8 outfit = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].currOutfitId;
+                u8 gender = gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].gender;
+
+                if (outfit < OUTFIT_COUNT)
+                    trainerPicId = GetPlayerTrainerPicIdByOutfitGenderType(outfit, gender, 0);
                 else
                     trainerPicId = PlayerGenderToFrontTrainerPicId(gLinkPlayers[GetBattlerMultiplayerId(gActiveBattler)].gender);
             }
@@ -1293,9 +1296,11 @@ static void LinkOpponentHandleDrawTrainerPic(void)
             //! advantage so that our game won't freak out as much
             //! we also defaults to 0 if the player has an outfit
             //! our game don't
-            u8 outfit = gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].currOutfitId, gender = gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].gender;
-            if (gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].hasOutfit && outfit < OUTFIT_COUNT)
-                trainerPicId = gOutfits[outfit].trainerPics[gender][0];
+            u8 outfit = gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].currOutfitId;
+            u8 gender = gLinkPlayers[GetMultiplayerId() ^ BIT_SIDE].gender;
+
+            if (outfit < OUTFIT_COUNT)
+                trainerPicId = GetPlayerTrainerPicIdByOutfitGenderType(outfit, gender, 0);
             else
                 trainerPicId = PlayerGenderToFrontTrainerPicId(gender);
         }

@@ -28,6 +28,7 @@
 #include "text.h"
 #include "util.h"
 #include "window.h"
+#include "outfit_menu.h"
 #include "constants/battle_anim.h"
 #include "constants/items.h"
 #include "constants/moves.h"
@@ -2271,6 +2272,8 @@ static void PlayerHandleDrawTrainerPic(void)
 {
     s16 xPos, yPos;
     u32 trainerPicId;
+    u32 outfit = 0;
+    u32 gender = 0;
 
     if (gBattleTypeFlags & BATTLE_TYPE_LINK)
     {
@@ -2286,12 +2289,18 @@ static void PlayerHandleDrawTrainerPic(void)
         }
         else
         {
-            trainerPicId = gOutfits[gSaveBlock2Ptr->currOutfitId].trainerPics[gLinkPlayers[GetMultiplayerId()].gender][1];
+            outfit = gLinkPlayers[GetMultiplayerId()].currOutfitId;
+            gender = gLinkPlayers[GetMultiplayerId()].gender;
+
+            trainerPicId = GetPlayerTrainerPicIdByOutfitGenderType(outfit, gender, 1);
         }
     }
     else
     {
-        trainerPicId = gOutfits[gSaveBlock2Ptr->currOutfitId].trainerPics[gSaveBlock2Ptr->playerGender][1];
+        outfit = gSaveBlock2Ptr->currOutfitId;
+        gender = gSaveBlock2Ptr->playerGender;
+
+        trainerPicId = GetPlayerTrainerPicIdByOutfitGenderType(outfit, gender, 1);
     }
 
     if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
@@ -2321,7 +2330,7 @@ static void PlayerHandleDrawTrainerPic(void)
     // Use front pic table for any tag battles unless your partner is Steven.
     if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER && gPartnerTrainerId != TRAINER_STEVEN_PARTNER)
     {
-        trainerPicId = gOutfits[gSaveBlock2Ptr->currOutfitId].trainerPics[gSaveBlock2Ptr->playerGender][0];
+        trainerPicId = GetPlayerTrainerPicIdByOutfitGenderType(gSaveBlock2Ptr->currOutfitId, gSaveBlock2Ptr->playerGender, 0);
         DecompressTrainerFrontPic(trainerPicId, gActiveBattler);
         SetMultiuseSpriteTemplateToTrainerFront(trainerPicId, GetBattlerPosition(gActiveBattler));
         gBattlerSpriteIds[gActiveBattler] = CreateSprite(&gMultiuseSpriteTemplate, xPos, yPos, GetBattlerSpriteSubpriority(gActiveBattler));
@@ -2368,12 +2377,12 @@ static void PlayerHandleTrainerSlide(void)
         }
         else
         {
-            trainerPicId = gOutfits[gSaveBlock2Ptr->currOutfitId].trainerPics[gLinkPlayers[GetMultiplayerId()].gender][1];
+            trainerPicId = GetPlayerTrainerPicIdByOutfitGenderType(gLinkPlayers[GetMultiplayerId()].currOutfitId, gLinkPlayers[GetMultiplayerId()].gender, 1);;
         }
     }
     else
     {
-        trainerPicId = gOutfits[gSaveBlock2Ptr->currOutfitId].trainerPics[gSaveBlock2Ptr->playerGender][1];
+        trainerPicId = GetPlayerTrainerPicIdByOutfitGenderType(gSaveBlock2Ptr->currOutfitId, gSaveBlock2Ptr->playerGender, 1);;
     }
 
     DecompressTrainerBackPic(trainerPicId, gActiveBattler);
@@ -2947,6 +2956,7 @@ static void PlayerHandleIntroTrainerBallThrow(void)
 {
     u8 paletteNum;
     u8 taskId;
+    u32 trainerPic = GetPlayerTrainerPicIdByOutfitGenderType(gSaveBlock2Ptr->currOutfitId, gSaveBlock2Ptr->playerGender, 1);
 
     SetSpritePrimaryCoordsFromSecondaryCoords(&gSprites[gBattlerSpriteIds[gActiveBattler]]);
 
@@ -2960,7 +2970,7 @@ static void PlayerHandleIntroTrainerBallThrow(void)
     StartSpriteAnim(&gSprites[gBattlerSpriteIds[gActiveBattler]], 1);
 
     paletteNum = AllocSpritePalette(0xD6F8);
-    LoadCompressedPalette(gTrainerBackPicPaletteTable[gOutfits[gSaveBlock2Ptr->currOutfitId].trainerPics[gSaveBlock2Ptr->playerGender][1]].data, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
+    LoadCompressedPalette(gTrainerBackPicPaletteTable[trainerPic].data, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
     gSprites[gBattlerSpriteIds[gActiveBattler]].oam.paletteNum = paletteNum;
 
     taskId = CreateTask(Task_StartSendOutAnim, 5);
