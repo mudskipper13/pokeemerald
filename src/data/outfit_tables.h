@@ -90,11 +90,11 @@ static const u16 sMugshotPal_May[] = INCBIN_U16("graphics/battle_transitions/may
 const struct Outfit gOutfits[OUTFIT_COUNT] =
 {
     [OUTFIT_USUAL_GREEN] = {
-        //! TODO: implement
-        .isHidden = FALSE, //! DESC: if sets to TRUE, it will not shows in the OUTFIT menu.
+        //! DESC: if sets to TRUE, it will not be shown in the OUTFIT menu if it's locked.
+        .isHidden = FALSE,
 
-        //! TODO: implement
-        .prices = { 0, 0 }, //! DESC: prices for purchasing them.
+        //! DESC: prices for purchasing them.
+        .prices = { 0, 0 },
 
         //! agbcc doesnt like COMPOUND_STRING on my end
         //! DESC: outfit's name
@@ -135,7 +135,7 @@ const struct Outfit gOutfits[OUTFIT_COUNT] =
         .iconsFP = { FRONTIER_PASS_GFX(BrendanMay, Brendan, May) },
     },
     [OUTFIT_UNUSUAL_RED] = {
-        .isHidden = FALSE,
+        .isHidden = TRUE,
         .prices = { 200, 500 },
         #if MODERN == 1
         .name = COMPOUND_STRING("UNUSUAL RED"),
