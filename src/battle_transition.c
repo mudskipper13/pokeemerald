@@ -893,6 +893,8 @@ static const u16 sMugshotPal_Phoebe[] = INCBIN_U16("graphics/battle_transitions/
 static const u16 sMugshotPal_Glacia[] = INCBIN_U16("graphics/battle_transitions/glacia_bg.gbapal");
 static const u16 sMugshotPal_Drake[] = INCBIN_U16("graphics/battle_transitions/drake_bg.gbapal");
 static const u16 sMugshotPal_Champion[] = INCBIN_U16("graphics/battle_transitions/wallace_bg.gbapal");
+static const u16 sMugshotPal_Brendan[] = INCBIN_U16("graphics/battle_transitions/brendan_bg.gbapal");
+static const u16 sMugshotPal_May[] = INCBIN_U16("graphics/battle_transitions/may_bg.gbapal");
 
 static const u16 *const sOpponentMugshotsPals[MUGSHOTS_COUNT] =
 {
@@ -901,6 +903,12 @@ static const u16 *const sOpponentMugshotsPals[MUGSHOTS_COUNT] =
     [MUGSHOT_GLACIA] = sMugshotPal_Glacia,
     [MUGSHOT_DRAKE] = sMugshotPal_Drake,
     [MUGSHOT_CHAMPION] = sMugshotPal_Champion
+};
+
+static const u16 *const sPlayerMugshotsPals[GENDER_COUNT] =
+{
+    [MALE] = sMugshotPal_Brendan,
+    [FEMALE] = sMugshotPal_May
 };
 
 static const u16 sUnusedTrainerPalette[] = INCBIN_U16("graphics/battle_transitions/unused_trainer.gbapal");
@@ -2322,7 +2330,7 @@ static bool8 Mugshot_SetGfx(struct Task *task)
     GetBg0TilesDst(&tilemap, &tileset);
     CpuSet(sEliteFour_Tileset, tileset, 0xF0);
     LoadPalette(sOpponentMugshotsPals[task->tMugshotId], BG_PLTT_ID(15), PLTT_SIZE_4BPP);
-    LoadPalette(GetPlayerBattleTransitionMugshotPalette(), BG_PLTT_ID(15) + 10, PLTT_SIZEOF(6));
+    LoadPalette(sPlayerMugshotsPals[gSaveBlock2Ptr->playerGender], BG_PLTT_ID(15) + 10, PLTT_SIZEOF(6));
 
     for (i = 0; i < 20; i++)
     {
