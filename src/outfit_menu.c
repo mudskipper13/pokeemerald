@@ -764,11 +764,7 @@ const void *GetPlayerHeadGfxOrPal(u8 which, bool32 isFP)
     else
     {
         if (isFP)
-        {
-            return gSaveBlock2Ptr->playerGender ?
-                        gOutfits[gSaveBlock2Ptr->currOutfitId].iconsFP + 0x80 :
-                        gOutfits[gSaveBlock2Ptr->currOutfitId].iconsFP;
-        }
+            return gOutfits[gSaveBlock2Ptr->currOutfitId].iconsFP[gSaveBlock2Ptr->playerGender];
         else
             return gOutfits[gSaveBlock2Ptr->currOutfitId].iconsRM[gSaveBlock2Ptr->playerGender];
     }

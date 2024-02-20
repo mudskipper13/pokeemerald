@@ -21,9 +21,11 @@ static const u16 sRegionMapPlayerIcon_RSMayGfx[] = INCBIN_U16("graphics/pokenav/
 
 //! TODO: Should the gfx here be seperated?
 
-static const u8 sFrontierPassPlayerIcons_BrendanMay_Gfx[] = INCBIN_U8("graphics/frontier_pass/map_heads.4bpp");
+static const u8 sFrontierPassPlayerIcon_BrendanGfx[] = INCBIN_U8("graphics/frontier_pass/map_heads/brendan.4bpp");
+static const u8 sFrontierPassPlayerIcon_MayGfx[] = INCBIN_U8("graphics/frontier_pass/map_heads/may.4bpp");
 
-static const u8 sFrontierPassPlayerIcons_RSBrendanMay_Gfx[] = INCBIN_U8("graphics/frontier_pass/rs_map_heads.4bpp");
+static const u8 sFrontierPassPlayerIcon_RSBrendanGfx[] = INCBIN_U8("graphics/frontier_pass/map_heads/rs_brendan.4bpp");
+static const u8 sFrontierPassPlayerIcon_RSMayGfx[] = INCBIN_U8("graphics/frontier_pass/map_heads/rs_may.4bpp");
 
 #define TRAINER_ID(m, f) \
 { \
@@ -64,6 +66,7 @@ static const u8 sFrontierPassPlayerIcons_RSBrendanMay_Gfx[] = INCBIN_U8("graphic
 }
 
 #define REGION_MAP_GFX(m, f) { sRegionMapPlayerIcon_ ## m ## Gfx, sRegionMapPlayerIcon_ ## f ## Gfx }
+#define FRONTIER_PASS_GFX(m, f) { sFrontierPassPlayerIcon_ ## m ## Gfx, sFrontierPassPlayerIcon_ ## f ## Gfx }
 
 //! :^)
 #define TRAINER_PIC_RUBY_SAPPHIRE_BRENDAN TRAINER_PIC_RS_BRENDAN
@@ -111,7 +114,7 @@ const struct Outfit gOutfits[OUTFIT_COUNT] =
         //! DESC: head icons gfx&pal for frontier pass
         //! note that frontier pass needs to be in one sprite instead of two,
         //! unlike region map. (probably should split them tbh)
-        .iconsFP = sFrontierPassPlayerIcons_BrendanMay_Gfx,
+        .iconsFP = FRONTIER_PASS_GFX(Brendan, May),
     },
     [OUTFIT_UNUSUAL_RED] = {
         .isHidden = TRUE,
@@ -127,6 +130,6 @@ const struct Outfit gOutfits[OUTFIT_COUNT] =
         .avatarGfxIds = AVATAR_GFX_ID(BRENDAN, MAY),
         .animGfxIds = ANIM_GFX_ID(BRENDAN, MAY),
         .iconsRM = REGION_MAP_GFX(RSBrendan, RSMay),
-        .iconsFP = sFrontierPassPlayerIcons_RSBrendanMay_Gfx,
+        .iconsFP = FRONTIER_PASS_GFX(RSBrendan, RSMay),
     },
 };
