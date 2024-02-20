@@ -1997,12 +1997,7 @@ static void LoadObjectEventPalette(u16 paletteTag)
 {
     u16 i = FindObjectEventPaletteIndexByTag(paletteTag);
 
-// FindObjectEventPaletteIndexByTag returns 0xFF on failure, not OBJ_EVENT_PAL_TAG_NONE.
-#ifdef BUGFIX
     if (i != 0xFF)
-#else
-    if (i != OBJ_EVENT_PAL_TAG_NONE)
-#endif
         LoadSpritePaletteIfTagExists(&sObjectEventSpritePalettes[i]);
 }
 
@@ -8956,4 +8951,13 @@ u8 MovementAction_FlyDown_Step1(struct ObjectEvent *objectEvent, struct Sprite *
 u8 MovementAction_Fly_Finish(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
     return TRUE;
+}
+
+const struct SpritePalette *GetObjectEventPaletteFromTag(u16 tag)
+{
+    u32 i = FindObjectEventPaletteIndexByTag(tag);
+    if (i == 0xFF)
+        i = 0; 
+
+    return &sObjectEventSpritePalettes[i];
 }
