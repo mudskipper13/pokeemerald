@@ -4,7 +4,7 @@
 SINGLE_BATTLE_TEST("Dancer can copy a dance move immediately after it was used and allow the user of Dancer to still use its move")
 {
     GIVEN {
-        ASSUME(gBattleMoves[MOVE_QUIVER_DANCE].danceMove == TRUE);
+        ASSUME(gMovesInfo[MOVE_QUIVER_DANCE].danceMove == TRUE);
         PLAYER(SPECIES_WOBBUFFET)
         OPPONENT(SPECIES_ORICORIO) { Ability(ABILITY_DANCER); }
     } WHEN {
@@ -22,7 +22,7 @@ SINGLE_BATTLE_TEST("Dancer can copy a dance move immediately after it was used a
 SINGLE_BATTLE_TEST("Dancer can copy Teeter Dance")
 {
     GIVEN {
-        ASSUME(gBattleMoves[MOVE_TEETER_DANCE].danceMove == TRUE);
+        ASSUME(gMovesInfo[MOVE_TEETER_DANCE].danceMove == TRUE);
         PLAYER(SPECIES_WOBBUFFET)
         OPPONENT(SPECIES_ORICORIO) { Ability(ABILITY_DANCER); Item(ITEM_LUM_BERRY); }
     } WHEN {
