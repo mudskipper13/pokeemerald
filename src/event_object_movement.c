@@ -19,6 +19,7 @@
 #include "palette.h"
 #include "random.h"
 #include "sprite.h"
+#include "sound.h"
 #include "task.h"
 #include "trainer_see.h"
 #include "trainer_hill.h"
@@ -28,6 +29,7 @@
 #include "constants/field_effects.h"
 #include "constants/items.h"
 #include "constants/mauville_old_man.h"
+#include "constants/songs.h"
 #include "constants/trainer_types.h"
 #include "constants/union_room.h"
 
@@ -7818,6 +7820,8 @@ void GroundEffect_StepOnTallGrass(struct ObjectEvent *objEvent, struct Sprite *s
     gFieldEffectArguments[5] = objEvent->mapGroup;
     gFieldEffectArguments[6] = (u8)gSaveBlock1Ptr->location.mapNum << 8 | (u8)gSaveBlock1Ptr->location.mapGroup;
     gFieldEffectArguments[7] = FALSE; // don't skip to end of anim
+    if (objEvent->localId == OBJ_EVENT_ID_PLAYER)
+        PlaySE(SE_M_POISON_POWDER);
     FieldEffectStart(FLDEFF_TALL_GRASS);
 }
 
@@ -7844,6 +7848,8 @@ void GroundEffect_StepOnLongGrass(struct ObjectEvent *objEvent, struct Sprite *s
     gFieldEffectArguments[5] = objEvent->mapGroup;
     gFieldEffectArguments[6] = (u8)gSaveBlock1Ptr->location.mapNum << 8 | (u8)gSaveBlock1Ptr->location.mapGroup;
     gFieldEffectArguments[7] = 0;
+    if (objEvent->localId == OBJ_EVENT_ID_PLAYER)
+        PlaySE(SE_M_POISON_POWDER);
     FieldEffectStart(FLDEFF_LONG_GRASS);
 }
 
