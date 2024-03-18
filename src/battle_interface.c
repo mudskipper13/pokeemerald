@@ -1211,7 +1211,7 @@ void UpdateHpTextInHealthbox(u32 healthboxSpriteId, u32 maxOrCurrent, s16 currHp
     {
         if (GetBattlerSide(battlerId) == B_SIDE_PLAYER) // Player
         {
-            PrintHpOnHealthbox(healthboxSpriteId, currHp, maxHp, 5, 0xB00, 0x3A0);
+            PrintHpOnHealthbox(healthboxSpriteId, currHp, maxHp, 9, 0xB00, 0x3A0);
         }
         else // Opponent
         {
@@ -2916,8 +2916,8 @@ static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *str, u32 x, u32 y,
     FillWindowPixelBuffer(winId, PIXEL_FILL(bgColor));
 
     color[0] = bgColor;
-    color[1] = 1;
-    color[2] = 9;
+    color[1] = 2;
+    color[2] = 1;
 
     AddTextPrinterParameterized4(winId, FONT_SMALL, x, y, 0, 0, color, TEXT_SKIP_DRAW, str);
 
