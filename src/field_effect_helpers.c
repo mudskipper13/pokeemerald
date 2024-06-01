@@ -1751,7 +1751,7 @@ static bool8 Saving_Init(struct Task *task)
 {
     u8 spriteId;
     struct Sprite *sprite;
-    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240-16, 12, 0xFF);
+    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16, 12, 0xFF);
     task->eSavingSpriteID = spriteId;
     if (spriteId != MAX_SPRITES)
     {
@@ -1767,10 +1767,19 @@ static bool8 Saving_Init(struct Task *task)
 }
 
 static bool8 Saving_WaitForFinish(struct Task *task)
-{   
-    FieldEffectActiveListRemove(FLDEFF_SAVING);
-    DestroyTask(FindTaskIdByFunc(Task_Saving));
-    task->eSavingAnimFrame++;
+{
+    struct Sprite *sprite = &gSprites[task->eSavingSpriteID];
+
+    if (sprite->x != (240-16))
+    {
+	sprite->x--;
+    }
+    else
+    {
+    	FieldEffectActiveListRemove(FLDEFF_SAVING);
+    	DestroyTask(FindTaskIdByFunc(Task_Saving));
+    	task->eSavingAnimFrame++;
+    }
     return FALSE;
 }
 
@@ -1778,7 +1787,14 @@ void SavingSpriteCallback(struct Sprite *sprite)
 {   
     if(FlagGet(FLAG_TEMP_F))
     {
-        FieldEffectFreeGraphicsResources(sprite);
-        FlagClear(FLAG_TEMP_F);
+	if (sprite->x != 240+16)
+	{
+	    sprite->x++;
+	}
+	else
+	{
+            FieldEffectFreeGraphicsResources(sprite);
+            FlagClear(FLAG_TEMP_F);
+	}
     }
 }
