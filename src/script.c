@@ -3,6 +3,7 @@
 #include "event_data.h"
 #include "mystery_gift.h"
 #include "util.h"
+#include "start_menu.h"
 #include "constants/event_objects.h"
 #include "constants/map_scripts.h"
 
