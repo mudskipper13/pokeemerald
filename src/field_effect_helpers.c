@@ -1749,37 +1749,18 @@ static void Task_Saving(u8 taskId)
 
 static bool8 Saving_Init(struct Task *task)
 {
-    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
-    s16 x = playerObjEvent->currentCoords.x;
-    s16 y = playerObjEvent->currentCoords.y;
-    s16 x2;
-    s16 y2;    
-    s16 x_diff;
-    s16 y_diff;
-
     u8 spriteId;
     struct Sprite *sprite;
-    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 0, 0, 0xFF);
+    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240-16, 12, 0xFF);
     task->eSavingSpriteID = spriteId;
     if (spriteId != MAX_SPRITES)
     {
         sprite = &gSprites[spriteId];
         sprite->oam.priority = 0;
         sprite->invisible = FALSE;
-        sprite->coordOffsetEnabled = TRUE;
     }
     sprite = &gSprites[spriteId];
-
-    y_diff = 1;
-    x_diff = 0;
-
-    SetSpritePosToMapCoords((playerObjEvent->currentCoords.x + x_diff), (playerObjEvent->currentCoords.y + y_diff), &x2, &y2);
     StartSpriteAnim(sprite, 0);
-    sprite->x = x2 + 8;
-    sprite->y = y2 + 8;
-    sprite->data[0] = playerObjEvent->currentCoords.x;
-    sprite->data[1] = playerObjEvent->currentCoords.y;
-
     task->eSavingAnimFrame = 0;
     task->eState++;
     return FALSE;
