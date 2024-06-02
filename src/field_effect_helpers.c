@@ -1727,6 +1727,11 @@ static const s8 sFigure8YOffsets[FIGURE_8_LENGTH] = {
 
 #define sSavingSpriteID2     data[0] // stored in first sprite data instead of task data
 
+// controls how fast the sliding in/out animations goes
+// note that you may only put even numbers such as 2, 4, 6 and so on
+#define SAVING_SPRITE_SLIDING_SPEED 4
+
+
 static void Task_Saving(u8 taskId);
 static u8 Saving_Init(struct Task *task);
 static u8 Saving_WaitForFinish(struct Task *task);
@@ -1788,7 +1793,7 @@ static bool8 Saving_WaitForFinish(struct Task *task)
 
     if (x != (240-48))
     {
-	x -= 2;
+	x -= SAVING_SPRITE_SLIDING_SPEED;
 	sprite->x = x;
 	sprite2->x = (x+32); // distanced by 32 with first frame
     }
@@ -1809,7 +1814,7 @@ void SavingSpriteCallback(struct Sprite *sprite)
     {
 	if (x != 240+48)
 	{
-	    x += 2;
+	    x += SAVING_SPRITE_SLIDING_SPEED;
 	    sprite->x = x;
 	    sprite2->x = x+32;
 	}
