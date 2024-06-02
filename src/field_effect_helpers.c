@@ -1721,9 +1721,11 @@ static const s8 sFigure8YOffsets[FIGURE_8_LENGTH] = {
 
 
 
-#define eState                  data[0]
+#define eState               data[0]
 #define eSavingSpriteID      data[1]
 #define eSavingAnimFrame     data[4]
+
+#define sSavingSpriteID2     data[0] // stored in first sprite data instead of task data
 
 static void Task_Saving(u8 taskId);
 static u8 Saving_Init(struct Task *task);
@@ -1749,18 +1751,31 @@ static void Task_Saving(u8 taskId)
 
 static bool8 Saving_Init(struct Task *task)
 {
-    u8 spriteId;
-    struct Sprite *sprite;
-    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16, 12, 0xFF);
+    u8 spriteId, spriteId2;
+    struct Sprite *sprite, *sprite2;
+    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16, 12, 0xFE);
+    spriteId2 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16+32, 12, 0xFF);
     task->eSavingSpriteID = spriteId;
+
     if (spriteId != MAX_SPRITES)
     {
         sprite = &gSprites[spriteId];
         sprite->oam.priority = 0;
         sprite->invisible = FALSE;
     }
+
+    if (spriteId2 != MAX_SPRITES)
+    {
+	sprite2 = &gSprites[spriteId2];
+	sprite2->oam.priority = 0;
+	sprite2->invisible = FALSE;
+    }
     sprite = &gSprites[spriteId];
+    sprite->sSavingSpriteID2 = spriteId2; // save second sprite id onto first sprite data
+    sprite2 = &gSprites[spriteId2];
+    sprite2->callback = SpriteCallbackDummy; // control slide out only on first sprite callback 
     StartSpriteAnim(sprite, 0);
+    StartSpriteAnim(sprite2, 1); // second frame is the other half
     task->eSavingAnimFrame = 0;
     task->eState++;
     return FALSE;
@@ -1768,11 +1783,14 @@ static bool8 Saving_Init(struct Task *task)
 
 static bool8 Saving_WaitForFinish(struct Task *task)
 {
-    struct Sprite *sprite = &gSprites[task->eSavingSpriteID];
+    struct Sprite *sprite = &gSprites[task->eSavingSpriteID], *sprite2 = &gSprites[sprite->sSavingSpriteID2];
+    int x = sprite->x;
 
-    if (sprite->x != (240-16))
+    if (x != (240-48))
     {
-	sprite->x--;
+	x -= 2;
+	sprite->x = x;
+	sprite2->x = (x+32); // distanced by 32 with first frame
     }
     else
     {
@@ -1784,12 +1802,16 @@ static bool8 Saving_WaitForFinish(struct Task *task)
 }
 
 void SavingSpriteCallback(struct Sprite *sprite)
-{   
+{  
+    struct Sprite *sprite2 = &gSprites[sprite->sSavingSpriteID2];
+    int x = sprite->x;
     if(FlagGet(FLAG_TEMP_F))
     {
-	if (sprite->x != 240+16)
+	if (x != 240+48)
 	{
-	    sprite->x++;
+	    x += 2;
+	    sprite->x = x;
+	    sprite2->x = x+32;
 	}
 	else
 	{
@@ -1798,3 +1820,4 @@ void SavingSpriteCallback(struct Sprite *sprite)
 	}
     }
 }
+

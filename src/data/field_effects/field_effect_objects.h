@@ -1288,7 +1288,6 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_Rayquaza = {
 
 static const struct SpritePalette sSpritePalette_Unused = {gObjectEventPal_Npc3, FLDEFF_PAL_TAG_UNKNOWN};
 
-
 const struct SpritePalette gSpritePalette_SavingFieldEffect = {gFieldEffectObjectPaletteSaving, FLDEFF_PAL_TAG_SAVING};
 
 static const union AnimCmd sSavingAnim[] =
@@ -1297,13 +1296,21 @@ static const union AnimCmd sSavingAnim[] =
     ANIMCMD_JUMP(0),
 };
 
+static const union AnimCmd sSavingAnim2[] =
+{
+    ANIMCMD_FRAME(1, 20),
+    ANIMCMD_JUMP(0),
+};
+
 static const struct SpriteFrameImage sPicTable_Saving[] = {
-    overworld_frame(gFieldEffectObjectPic_Saving, 4, 2, 0)
+    overworld_frame(gFieldEffectObjectPic_Saving, 4, 2, 0),
+    overworld_frame(gFieldEffectObjectPic_Saving, 4, 2, 1),
 };
 
 static const union AnimCmd *const sAnimTable_Saving[] =
 {
     sSavingAnim,
+    sSavingAnim2,
 };
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_Saving = {
@@ -1315,3 +1322,4 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_Saving = {
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SavingSpriteCallback,
 };
+
