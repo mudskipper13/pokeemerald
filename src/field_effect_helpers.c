@@ -15,6 +15,7 @@
 #include "task.h"
 #include "field_player_avatar.h"
 #include "event_data.h"
+#include "overworld.h"
 
 #define OBJ_EVENT_PAL_TAG_NONE 0x11FF // duplicate of define in event_object_movement.c
 
@@ -1726,6 +1727,8 @@ static const s8 sFigure8YOffsets[FIGURE_8_LENGTH] = {
 #define eSavingAnimFrame     data[4]
 
 #define sSavingSpriteID2     data[0] // stored in first sprite data instead of task data
+#define sSavingSpriteID3     data[1]
+#define sSavingSpriteID4     data[2]
 
 // controls how fast the sliding in/out animations goes
 // note that you may only put even numbers such as 2, 4, 6 and so on
@@ -1759,8 +1762,14 @@ static bool8 Saving_Init(struct Task *task)
     u8 spriteId, spriteId2;
     struct Sprite *sprite, *sprite2;
     spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16, 12, 0xFE);
-    spriteId2 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16+32, 12, 0xFF);
+    spriteId2 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16+32, 12, 0xFE);
     task->eSavingSpriteID = spriteId;
+
+    if (GetFlashLevel() > 0)
+    {
+	SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_OBJWIN_ON);
+	SetGpuRegBits(REG_OFFSET_WINOUT, WINOUT_WINOBJ_OBJ);
+    }
 
     if (spriteId != MAX_SPRITES)
     {
@@ -1781,6 +1790,35 @@ static bool8 Saving_Init(struct Task *task)
     sprite2->callback = SpriteCallbackDummy; // control slide out only on first sprite callback 
     StartSpriteAnim(sprite, 0);
     StartSpriteAnim(sprite2, 1); // second frame is the other half
+    if (GetFlashLevel() > 0)
+    {
+        u8 spriteId3, spriteId4;
+        struct Sprite *sprite3, *sprite4;
+
+	spriteId3 = CreateCopySpriteAt(sprite, 176+16, 12, 0xFE);
+	spriteId4 = CreateCopySpriteAt(sprite2, 208+16, 12, 0xFE);
+	sprite->sSavingSpriteID3 = spriteId3;
+        sprite->sSavingSpriteID4 = spriteId4;
+
+        if (spriteId3 != MAX_SPRITES)
+        {
+            sprite3 = &gSprites[spriteId3];
+            sprite3->oam.priority = 0;
+	    sprite3->invisible = FALSE;
+	    sprite3->oam.objMode = ST_OAM_OBJ_WINDOW; 
+        }
+
+        if (spriteId4 != MAX_SPRITES)
+        {
+            sprite4 = &gSprites[spriteId4];
+            sprite4->oam.priority = 0;
+            sprite4->invisible = FALSE;
+            sprite4->oam.objMode = ST_OAM_OBJ_WINDOW;
+        }
+        sprite4->callback = SpriteCallbackDummy;
+        StartSpriteAnim(sprite3, 0);
+        StartSpriteAnim(sprite4, 1);
+    }
     task->eSavingAnimFrame = 0;
     task->eState++;
     return FALSE;
@@ -1808,7 +1846,7 @@ static bool8 Saving_WaitForFinish(struct Task *task)
 
 void SavingSpriteCallback(struct Sprite *sprite)
 {  
-    struct Sprite *sprite2 = &gSprites[sprite->sSavingSpriteID2];
+    struct Sprite *sprite2 = &gSprites[sprite->sSavingSpriteID2], *sprite3 = &gSprites[sprite->sSavingSpriteID3], *sprite4 = &gSprites[sprite->sSavingSpriteID4];
     int x = sprite->x;
     if(FlagGet(FLAG_TEMP_F))
     {
@@ -1819,9 +1857,11 @@ void SavingSpriteCallback(struct Sprite *sprite)
 	    sprite2->x = x+32;
 	}
 	else
-	{
+        {
+	    DestroySprite(sprite2);
             FieldEffectFreeGraphicsResources(sprite);
             FlagClear(FLAG_TEMP_F);
+	    FlagSet(FLAG_TEMP_E);
 	}
     }
 }
