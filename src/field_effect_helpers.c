@@ -19,6 +19,11 @@
 
 #define OBJ_EVENT_PAL_TAG_NONE 0x11FF // duplicate of define in event_object_movement.c
 
+static EWRAM_DATA u8 sSavingSpriteId1 = 0;
+static EWRAM_DATA u8 sSavingSpriteId2 = 0;
+static EWRAM_DATA u8 sSavingSpriteId3 = 0;
+static EWRAM_DATA u8 sSavingSpriteId4 = 0;
+
 static void UpdateObjectReflectionSprite(struct Sprite *);
 static void LoadObjectReflectionPalette(struct ObjectEvent *objectEvent, struct Sprite *sprite);
 static void LoadObjectHighBridgeReflectionPalette(struct ObjectEvent *, u8);
@@ -1759,11 +1764,9 @@ static void Task_Saving(u8 taskId)
 
 static bool8 Saving_Init(struct Task *task)
 {
-    u8 spriteId, spriteId2;
     struct Sprite *sprite, *sprite2;
-    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16, 12, 0xFE);
-    spriteId2 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16+32, 12, 0xFE);
-    task->eSavingSpriteID = spriteId;
+    sSavingSpriteId1 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16, 12, 0xFE);
+    sSavingSpriteId2 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16+32, 12, 0xFE);
 
     if (GetFlashLevel() > 0)
     {
@@ -1771,50 +1774,47 @@ static bool8 Saving_Init(struct Task *task)
 	SetGpuRegBits(REG_OFFSET_WINOUT, WINOUT_WINOBJ_OBJ);
     }
 
-    if (spriteId != MAX_SPRITES)
+    if (sSavingSpriteId1 != MAX_SPRITES)
     {
-        sprite = &gSprites[spriteId];
+        sprite = &gSprites[sSavingSpriteId1];
         sprite->oam.priority = 0;
         sprite->invisible = FALSE;
     }
 
-    if (spriteId2 != MAX_SPRITES)
+    if (sSavingSpriteId2 != MAX_SPRITES)
     {
-	sprite2 = &gSprites[spriteId2];
+	sprite2 = &gSprites[sSavingSpriteId2];
 	sprite2->oam.priority = 0;
 	sprite2->invisible = FALSE;
     }
-    sprite = &gSprites[spriteId];
-    sprite->sSavingSpriteID2 = spriteId2; // save second sprite id onto first sprite data
-    sprite2 = &gSprites[spriteId2];
+    sprite = &gSprites[sSavingSpriteId1];
+    sprite2 = &gSprites[sSavingSpriteId2];
     sprite2->callback = SpriteCallbackDummy; // control slide out only on first sprite callback 
     StartSpriteAnim(sprite, 0);
     StartSpriteAnim(sprite2, 1); // second frame is the other half
     if (GetFlashLevel() > 0)
     {
-        u8 spriteId3, spriteId4;
         struct Sprite *sprite3, *sprite4;
 
-	spriteId3 = CreateCopySpriteAt(sprite, 176+16, 12, 0xFE);
-	spriteId4 = CreateCopySpriteAt(sprite2, 208+16, 12, 0xFE);
-	sprite->sSavingSpriteID3 = spriteId3;
-        sprite->sSavingSpriteID4 = spriteId4;
+	sSavingSpriteId3 = CreateCopySpriteAt(sprite, 176+16, 12, 0xFE);
+	sSavingSpriteId4 = CreateCopySpriteAt(sprite2, 208+16, 12, 0xFE);
 
-        if (spriteId3 != MAX_SPRITES)
+        if (sSavingSpriteId3 != MAX_SPRITES)
         {
-            sprite3 = &gSprites[spriteId3];
+            sprite3 = &gSprites[sSavingSpriteId3];
             sprite3->oam.priority = 0;
 	    sprite3->invisible = FALSE;
-	    sprite3->oam.objMode = ST_OAM_OBJ_WINDOW; 
+	    sprite3->oam.objMode = ST_OAM_OBJ_WINDOW;
         }
 
-        if (spriteId4 != MAX_SPRITES)
+        if (sSavingSpriteId4 != MAX_SPRITES)
         {
-            sprite4 = &gSprites[spriteId4];
+            sprite4 = &gSprites[sSavingSpriteId4];
             sprite4->oam.priority = 0;
             sprite4->invisible = FALSE;
             sprite4->oam.objMode = ST_OAM_OBJ_WINDOW;
         }
+	sprite3->callback = SpriteCallbackDummy;
         sprite4->callback = SpriteCallbackDummy;
         StartSpriteAnim(sprite3, 0);
         StartSpriteAnim(sprite4, 1);
@@ -1826,7 +1826,7 @@ static bool8 Saving_Init(struct Task *task)
 
 static bool8 Saving_WaitForFinish(struct Task *task)
 {
-    struct Sprite *sprite = &gSprites[task->eSavingSpriteID], *sprite2 = &gSprites[sprite->sSavingSpriteID2];
+    struct Sprite *sprite = &gSprites[sSavingSpriteId1], *sprite2 = &gSprites[sSavingSpriteId2];
     int x = sprite->x;
 
     if (x != (240-48))
@@ -1846,7 +1846,7 @@ static bool8 Saving_WaitForFinish(struct Task *task)
 
 void SavingSpriteCallback(struct Sprite *sprite)
 {  
-    struct Sprite *sprite2 = &gSprites[sprite->sSavingSpriteID2], *sprite3 = &gSprites[sprite->sSavingSpriteID3], *sprite4 = &gSprites[sprite->sSavingSpriteID4];
+    struct Sprite *sprite2 = &gSprites[sSavingSpriteId2], *sprite3 = &gSprites[sSavingSpriteId3], *sprite4 = &gSprites[sSavingSpriteId4];
     int x = sprite->x;
     if(FlagGet(FLAG_TEMP_F))
     {
@@ -1858,10 +1858,18 @@ void SavingSpriteCallback(struct Sprite *sprite)
 	}
 	else
         {
+	    u16 sheetTileStart = sprite->sheetTileStart;
+	    u32 paletteNum = sprite->oam.paletteNum;
+	    FieldEffectFreeTilesIfUnused(sheetTileStart);
+	    FieldEffectFreePaletteIfUnused(paletteNum);
+	    if (GetFlashLevel() > 0 && (sSavingSpriteId3 != MAX_SPRITES && sSavingSpriteId4 != MAX_SPRITES))
+	    {
+		DestroySprite(sprite3);
+		DestroySprite(sprite4);
+	    }
 	    DestroySprite(sprite2);
-            FieldEffectFreeGraphicsResources(sprite);
+            DestroySprite(sprite);
             FlagClear(FLAG_TEMP_F);
-	    FlagSet(FLAG_TEMP_E);
 	}
     }
 }
