@@ -1765,8 +1765,8 @@ static void Task_Saving(u8 taskId)
 static bool8 Saving_Init(struct Task *task)
 {
     struct Sprite *sprite, *sprite2;
-    sSavingSpriteId1 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16, 12, 0xFE);
-    sSavingSpriteId2 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16+32, 12, 0xFE);
+    sSavingSpriteId1 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16, 12, 0);
+    sSavingSpriteId2 = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SAVING], 240+16+32, 12, 0);
 
     if (GetFlashLevel() > 0)
     {
@@ -1796,8 +1796,8 @@ static bool8 Saving_Init(struct Task *task)
     {
         struct Sprite *sprite3, *sprite4;
 
-	sSavingSpriteId3 = CreateCopySpriteAt(sprite, 176+16, 12, 0xFE);
-	sSavingSpriteId4 = CreateCopySpriteAt(sprite2, 208+16, 12, 0xFE);
+	sSavingSpriteId3 = CreateCopySpriteAt(sprite, 176+16, 12, 0);
+	sSavingSpriteId4 = CreateCopySpriteAt(sprite2, 208+16, 12, 0);
 
         if (sSavingSpriteId3 != MAX_SPRITES)
         {
