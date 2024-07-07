@@ -1849,3 +1849,11 @@ const u8 gText_ExpShareOff[] = _("The Exp. Share has been turned off.{PAUSE_UNTI
 const u8 gText_BasePointsResetToZero[] = _("{STR_VAR_1}'s base points\nwere all reset to zero!{PAUSE_UNTIL_PRESS}");
 const u8 gText_Fertilize[] = _("FERTILIZE");
 const u8 gText_PlantBerry[] = _("PLANT BERRY");
+
+const u8 gText_SmallDot[] = _("·");
+const u8 gText_LargeDot[] = _("{EMOJI_CIRCLE}");
+const u8 gText_PageNav[] = _("{L_BUTTON}{R_BUTTON} PAGE");
+const u8 gText_BattleBg[] = _("BATTLE BG");
+const u8 gText_BattleBgGSC[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GSC");
+const u8 gText_BattleBgCustom[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CUSTOM");
+

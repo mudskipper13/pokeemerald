@@ -3061,4 +3061,11 @@ extern const u8 gText_BasePointsResetToZero[];
 extern const u8 gText_Fertilize[];
 extern const u8 gText_PlantBerry[];
 
+extern const u8 gText_SmallDot[];
+extern const u8 gText_LargeDot[];
+extern const u8 gText_PageNav[];
+extern const u8 gText_BattleBg[];
+extern const u8 gText_BattleBgGSC[];
+extern const u8 gText_BattleBgCustom[];
+
 #endif // GUARD_STRINGS_H
