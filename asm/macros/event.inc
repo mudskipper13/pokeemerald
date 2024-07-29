@@ -1939,3 +1939,22 @@
 	setvar VAR_0x8006, \item
 	special CreateEnemyEventMon
 	.endm
+
+	@ example_usage:
+	@ 	createfieldmugshot MUGSHOT_TEST, EMOTE_NORMAL
+	@ 	msgbox test
+	@ 	removefieldmugshot
+	@ 	createfieldmugshot MUGSHOT_TEST, EMOTE_ALT
+	@ 	msgbox test2
+	@ 	removefieldmugshot
+
+	.macro createfieldmugshot id:req, emote:req
+	setorcopyvar VAR_0x8003, \id
+	setorcopyvar VAR_0x8004, \emote
+	callnative CreateFieldMugshot
+	.endm
+
+	.macro removefieldmugshot
+	callnative RemoveFieldMugshot
+	.endm
+
