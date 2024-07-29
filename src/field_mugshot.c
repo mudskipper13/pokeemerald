@@ -45,8 +45,8 @@ void RemoveFieldMugshot(void)
 
 void CreateFieldMugshot(void)
 {
-    u16 id = gSpecialVar_0x8003;
-    u16 emote = gSpecialVar_0x8004;
+    u16 id = VarGet(VAR_TEMP_E);
+    u16 emote = VarGet(VAR_TEMP_F);
     struct CompressedSpriteSheet sheet = { .size=0x1000, .tag=TAG_MUGSHOT };
     struct SpritePalette pal = { .tag = sheet.tag };
 
