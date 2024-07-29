@@ -3,6 +3,7 @@
 #include "sprite.h"
 #include "script.h"
 #include "event_data.h"
+#include "field_weather.h"
 #include "constants/field_mugshots.h"
 #include "data/field_mugshots.h"
 
@@ -34,6 +35,7 @@ void RemoveFieldMugshot(void)
 {
     if (IndexOfSpritePaletteTag(TAG_MUGSHOT) != 0xFF)
     {
+        ResetPreservedPalettesInWeather();
         DestroySprite(&gSprites[sFieldMugshotSpriteId]);
         FreeSpritePaletteByTag(TAG_MUGSHOT);
         FreeSpriteTilesByTag(TAG_MUGSHOT);
@@ -65,4 +67,5 @@ void CreateFieldMugshot(void)
     {
         return;
     }
+    PreservePaletteInWeather(gSprites[sFieldMugshotSpriteId].oam.paletteNum + 0x10);
 }
