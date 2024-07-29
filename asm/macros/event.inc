@@ -1951,7 +1951,7 @@
 	@ spawn a mugshot in the overworld at a specific coordinate
 	@ NOTE: this macro uses VAR_TEMP_E and VAR_TEMP_F as its parameter
 	@ so be careful if you use them in your script too!
-	.macro createfieldmugshot id:req, emote:req
+	.macro createfieldmugshot id:req, emote=0
 	setorcopyvar VAR_TEMP_E, \id
 	setorcopyvar VAR_TEMP_F, \emote
 	callnative CreateFieldMugshot
