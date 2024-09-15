@@ -4,10 +4,13 @@
 #include "script.h"
 #include "event_data.h"
 #include "field_weather.h"
+#include "field_message_box.h"
+#include "field_mugshot.h"
 #include "constants/field_mugshots.h"
 #include "data/field_mugshots.h"
 
 static EWRAM_DATA u8 sFieldMugshotSpriteId = 0;
+static EWRAM_DATA u8 sIsFieldMugshotActive = 0;
 
 #define TAG_MUGSHOT 0x9000
 
@@ -15,6 +18,8 @@ static EWRAM_DATA u8 sFieldMugshotSpriteId = 0;
 // otherwise your sprite will not be placed in the place you desire
 #define MUGSHOT_X 168 + 32
 #define MUGSHOT_Y 51  + 32
+
+static void SpriteCB_FieldMugshot(struct Sprite *s);
 
 static const struct OamData sFieldMugshot_Oam = {
     .size = SPRITE_SIZE(64x64),
@@ -26,10 +31,22 @@ static const struct SpriteTemplate sFieldMugshot_SpriteTemplate = {
     .tileTag = TAG_MUGSHOT,
     .paletteTag = TAG_MUGSHOT,
     .oam = &sFieldMugshot_Oam,
-    .callback = SpriteCallbackDummy,
+    .callback = SpriteCB_FieldMugshot,
     .anims = gDummySpriteAnimTable,
     .affineAnims = gDummySpriteAffineAnimTable,
 };
+
+static void SpriteCB_FieldMugshot(struct Sprite *s)
+{
+    if (s->data[0] == TRUE)
+    {
+        s->invisible = FALSE;
+    }
+    else
+    {
+        s->invisible = TRUE;
+    }
+}
 
 void RemoveFieldMugshot(void)
 {
@@ -40,6 +57,7 @@ void RemoveFieldMugshot(void)
         FreeSpritePaletteByTag(TAG_MUGSHOT);
         FreeSpriteTilesByTag(TAG_MUGSHOT);
         sFieldMugshotSpriteId = SPRITE_NONE;
+        sIsFieldMugshotActive = FALSE;
     }
 }
 
@@ -68,4 +86,16 @@ void CreateFieldMugshot(void)
         return;
     }
     PreservePaletteInWeather(gSprites[sFieldMugshotSpriteId].oam.paletteNum + 0x10);
+    gSprites[sFieldMugshotSpriteId].data[0] = FALSE;
+    sIsFieldMugshotActive = TRUE;
+}
+
+u8 GetFieldMugshotSpriteId(void)
+{
+    return sFieldMugshotSpriteId;
+}
+
+u8 IsFieldMugshotActive(void)
+{
+    return sIsFieldMugshotActive;
 }
