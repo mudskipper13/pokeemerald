@@ -18,6 +18,7 @@
 #include "task.h"
 #include "text_window.h"
 #include "window.h"
+#include "field_mugshot.h"
 #include "constants/songs.h"
 
 #define DLG_WINDOW_PALETTE_NUM 15
@@ -145,6 +146,7 @@ void InitStandardTextBoxWindows(void)
     InitWindows(sStandardTextBox_WindowTemplates);
     sStartMenuWindowId = WINDOW_NONE;
     sMapNamePopupWindowId = WINDOW_NONE;
+    SetFieldMugshotSpriteId(WINDOW_NONE); // its the same as SPRITE_NONE
 }
 
 void FreeAllOverworldWindowBuffers(void)

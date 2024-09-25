@@ -105,3 +105,8 @@ u8 IsFieldMugshotActive(void)
 {
     return sIsFieldMugshotActive;
 }
+
+void SetFieldMugshotSpriteId(u32 value)
+{
+    sFieldMugshotSpriteId = value;
+}
