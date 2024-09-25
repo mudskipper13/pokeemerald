@@ -127,7 +127,6 @@ void _CreateFieldMugshot(u32 id, u32 emote)
     gSprites[sFieldMugshotSpriteIds[slot]].data[0] = FALSE;
     sIsFieldMugshotActive = TRUE;
     sFieldMugshotSlot ^= 1;
-    DebugPrintf("id: %u", sFieldMugshotSpriteIds[slot]);
 }
 
 u8 GetFieldMugshotSpriteId(void)
