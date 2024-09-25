@@ -9,10 +9,12 @@
 #include "constants/field_mugshots.h"
 #include "data/field_mugshots.h"
 
-static EWRAM_DATA u8 sFieldMugshotSpriteId = 0;
+static EWRAM_DATA u8 sFieldMugshotSpriteIds[2] = {};
 static EWRAM_DATA u8 sIsFieldMugshotActive = 0;
+static EWRAM_DATA u8 sFieldMugshotSlot = 0;
 
 #define TAG_MUGSHOT 0x9000
+#define TAG_MUGSHOT2 0x9001
 
 // don't remove the `+ 32`
 // otherwise your sprite will not be placed in the place you desire
@@ -50,15 +52,18 @@ static void SpriteCB_FieldMugshot(struct Sprite *s)
 
 void RemoveFieldMugshot(void)
 {
-    if (IndexOfSpritePaletteTag(TAG_MUGSHOT) != 0xFF)
+    ResetPreservedPalettesInWeather();
+    if (sFieldMugshotSpriteIds[0] != 0xFF)
     {
-        ResetPreservedPalettesInWeather();
-        DestroySprite(&gSprites[sFieldMugshotSpriteId]);
-        FreeSpritePaletteByTag(TAG_MUGSHOT);
-        FreeSpriteTilesByTag(TAG_MUGSHOT);
-        sFieldMugshotSpriteId = SPRITE_NONE;
-        sIsFieldMugshotActive = FALSE;
+        DestroySpriteAndFreeResources(&gSprites[sFieldMugshotSpriteIds[0]]);
+        sFieldMugshotSpriteIds[0] = SPRITE_NONE;
     }
+    if (sFieldMugshotSpriteIds[1] != 0xFF)
+    {
+        DestroySpriteAndFreeResources(&gSprites[sFieldMugshotSpriteIds[1]]);
+        sFieldMugshotSpriteIds[1] = SPRITE_NONE;
+    }
+    sIsFieldMugshotActive = FALSE;
 }
 
 void CreateFieldMugshot(void)
@@ -69,36 +74,65 @@ void CreateFieldMugshot(void)
     _CreateFieldMugshot(id, emote);
 }
 
+void _RemoveFieldMugshot(u8 slot)
+{
+    ResetPreservedPalettesInWeather();
+    if (sFieldMugshotSpriteIds[slot ^ 1] != SPRITE_NONE)
+    {
+        gSprites[sFieldMugshotSpriteIds[slot ^ 1]].data[0] = FALSE; // same as setting visibility
+    }
+
+    if (sFieldMugshotSpriteIds[slot] != SPRITE_NONE)
+    {
+        gSprites[sFieldMugshotSpriteIds[slot]].data[0] = FALSE; // same as setting visibility
+        DestroySpriteAndFreeResources(&gSprites[sFieldMugshotSpriteIds[slot]]);
+        sFieldMugshotSpriteIds[slot] = SPRITE_NONE;
+    }
+}
+
 void _CreateFieldMugshot(u32 id, u32 emote)
 {
-    struct CompressedSpriteSheet sheet = { .size=0x1000, .tag=TAG_MUGSHOT };
+    u32 slot = sFieldMugshotSlot;
+    struct SpriteTemplate temp = sFieldMugshot_SpriteTemplate;
+    struct CompressedSpriteSheet sheet = { .size=0x1000, .tag=slot+TAG_MUGSHOT };
     struct SpritePalette pal = { .tag = sheet.tag };
 
-    RemoveFieldMugshot();
+    DebugPrintf("id: %u, emote: %u, sFieldMugshotSlot: %u", id, emote, slot);
+    _RemoveFieldMugshot(slot ^ 1);
+    if (sIsFieldMugshotActive)
+    {
+        FreeSpriteTilesByTag(slot + TAG_MUGSHOT);
+        FreeSpritePaletteByTag(slot + TAG_MUGSHOT);
+    }
+
     if (id >= NELEMS(sFieldMugshots))
     {
         return;
     }
 
+    temp.tileTag = sheet.tag;
+    temp.paletteTag = sheet.tag;
     sheet.data = (sFieldMugshots[id][emote].gfx != NULL ? sFieldMugshots[id][emote].gfx : sFieldMugshotGfx_TestNormal);
     pal.data = (sFieldMugshots[id][emote].pal != NULL ? sFieldMugshots[id][emote].pal : sFieldMugshotPal_TestNormal);
 
-    LoadCompressedSpriteSheet(&sheet);
     LoadSpritePalette(&pal);
+    LoadCompressedSpriteSheet(&sheet);
 
-    sFieldMugshotSpriteId = CreateSprite(&sFieldMugshot_SpriteTemplate, MUGSHOT_X, MUGSHOT_Y, 0);
-    if (sFieldMugshotSpriteId == SPRITE_NONE)
+    sFieldMugshotSpriteIds[slot] = CreateSprite(&temp, MUGSHOT_X, MUGSHOT_Y, 0);
+    if (sFieldMugshotSpriteIds[slot] == SPRITE_NONE)
     {
         return;
     }
-    PreservePaletteInWeather(gSprites[sFieldMugshotSpriteId].oam.paletteNum + 0x10);
-    gSprites[sFieldMugshotSpriteId].data[0] = FALSE;
+    PreservePaletteInWeather(gSprites[sFieldMugshotSpriteIds[slot]].oam.paletteNum + 0x10);
+    gSprites[sFieldMugshotSpriteIds[slot]].data[0] = FALSE;
     sIsFieldMugshotActive = TRUE;
+    sFieldMugshotSlot ^= 1;
+    DebugPrintf("id: %u", sFieldMugshotSpriteIds[slot]);
 }
 
 u8 GetFieldMugshotSpriteId(void)
 {
-    return sFieldMugshotSpriteId;
+    return sFieldMugshotSpriteIds[sFieldMugshotSlot ^ 1];
 }
 
 u8 IsFieldMugshotActive(void)
@@ -108,5 +142,6 @@ u8 IsFieldMugshotActive(void)
 
 void SetFieldMugshotSpriteId(u32 value)
 {
-    sFieldMugshotSpriteId = value;
+    sFieldMugshotSpriteIds[0] = value;
+    sFieldMugshotSpriteIds[1] = value;
 }
