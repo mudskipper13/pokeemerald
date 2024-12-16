@@ -55,12 +55,16 @@ void RemoveFieldMugshot(void)
     ResetPreservedPalettesInWeather();
     if (sFieldMugshotSpriteIds[0] != 0xFF)
     {
-        DestroySpriteAndFreeResources(&gSprites[sFieldMugshotSpriteIds[0]]);
+        FreeSpriteTilesByTag(TAG_MUGSHOT);
+        FreeSpritePaletteByTag(TAG_MUGSHOT);
+        DestroySprite(&gSprites[sFieldMugshotSpriteIds[0]]);
         sFieldMugshotSpriteIds[0] = SPRITE_NONE;
     }
     if (sFieldMugshotSpriteIds[1] != 0xFF)
     {
-        DestroySpriteAndFreeResources(&gSprites[sFieldMugshotSpriteIds[1]]);
+        FreeSpriteTilesByTag(TAG_MUGSHOT2);
+        FreeSpritePaletteByTag(TAG_MUGSHOT2);
+        DestroySprite(&gSprites[sFieldMugshotSpriteIds[1]]);
         sFieldMugshotSpriteIds[1] = SPRITE_NONE;
     }
     sIsFieldMugshotActive = FALSE;
@@ -84,8 +88,10 @@ void _RemoveFieldMugshot(u8 slot)
 
     if (sFieldMugshotSpriteIds[slot] != SPRITE_NONE)
     {
-        gSprites[sFieldMugshotSpriteIds[slot]].data[0] = FALSE; // same as setting visibility
-        DestroySpriteAndFreeResources(&gSprites[sFieldMugshotSpriteIds[slot]]);
+        gSprites[sFieldMugshotSpriteIds[slot]].data[0] = TRUE; // same as setting visibility
+        FreeSpriteTilesByTag(slot + TAG_MUGSHOT);
+        FreeSpritePaletteByTag(slot + TAG_MUGSHOT);
+        DestroySprite(&gSprites[sFieldMugshotSpriteIds[slot]]);
         sFieldMugshotSpriteIds[slot] = SPRITE_NONE;
     }
 }
@@ -98,11 +104,9 @@ void _CreateFieldMugshot(u32 id, u32 emote)
     struct SpritePalette pal = { .tag = sheet.tag };
 
     DebugPrintf("id: %u, emote: %u, sFieldMugshotSlot: %u", id, emote, slot);
-    _RemoveFieldMugshot(slot ^ 1);
     if (sIsFieldMugshotActive)
     {
-        FreeSpriteTilesByTag(slot + TAG_MUGSHOT);
-        FreeSpritePaletteByTag(slot + TAG_MUGSHOT);
+        _RemoveFieldMugshot(slot);
     }
 
     if (id >= NELEMS(sFieldMugshots))
