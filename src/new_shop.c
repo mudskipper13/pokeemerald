@@ -455,7 +455,6 @@ static u8 CreateNewShopMenu(u8 martType)
     int numMenuItems;
 
     LockPlayerFieldControls();
-    DebugPrintf("lastTalked: %d", gSpecialVar_LastTalked);
     sMartInfo.martType = martType;
 
     switch (martType)
@@ -504,8 +503,6 @@ static void SetShopItemsForSale(const u16 *items)
     // Read items until ITEM_NONE / DECOR_NONE is reached
     while (items[i])
     {
-        DebugPrintf("SetShopItemsForSale \n"
-                    "       loop item: %d    loop idx: %d", items[i], i);
         sMartInfo.itemCount++;
         i++;
 
@@ -515,8 +512,6 @@ static void SetShopItemsForSale(const u16 *items)
         }
     }
     sMartInfo.itemCount++; // for ITEM_NONE / DECOR_NONE
-    DebugPrintf("SetShopItemsForSale \n"
-                "       end item: %d    end idx: %d", items[i], i);
 }
 
 static void InitShopItemsForSale(void)
@@ -534,9 +529,6 @@ static void InitShopItemsForSale(void)
     while (sMartInfo.itemSource[i])
     {
         *itemList = sMartInfo.itemSource[i];
-        DebugPrintf("InitShopItemsForSale \n"
-                    "       loop item source: %d    loop item list: %d",
-                                    sMartInfo.itemSource[i], sMartInfo.itemList[j]);
         i++;
         itemList++;
         j++;
@@ -544,9 +536,6 @@ static void InitShopItemsForSale(void)
         if (sMartInfo.martType == MART_TYPE_VARIABLE)
         {
             *itemPriceList = sMartInfo.itemSource[i];
-            DebugPrintf("InitShopItemsForSale \n"
-                        "       loop price source: %d    loop price list: %d",
-                                        sMartInfo.itemSource[i], sMartInfo.itemPriceList[j]);
             i++;
             itemPriceList++;
         }
@@ -554,9 +543,6 @@ static void InitShopItemsForSale(void)
 
     *itemList = ITEM_NONE;
     *itemPriceList = ITEM_NONE;
-    DebugPrintf("InitShopItemsForSale \n"
-                "       end item source: %d    end item list: %d    end price list: %d",
-                                sMartInfo.itemSource[i], sMartInfo.itemList[j], sMartInfo.itemPriceList[j]);
 }
 
 static u32 SearchItemListForPrice(u32 itemId)
@@ -567,9 +553,6 @@ static u32 SearchItemListForPrice(u32 itemId)
 
     for (i = 0; i < sMartInfo.itemCount; i++)
     {
-        DebugPrintf("SearchItemListForPrice \n"
-                    "       loop item list: %d    loop cost list: %d",
-                                    sMartInfo.itemList[i], sMartInfo.itemPriceList[i]);
         if (*itemList == itemId)
         {
             return *itemPriceList;
@@ -637,8 +620,6 @@ static void Task_HandleShopMenuQuit(u8 taskId)
 
     if (sMartInfo.callback)
         sMartInfo.callback();
-
-    DebugPrintf("Task_HandleShopMenuQuit");
 }
 
 static void Task_GoToBuyOrSellMenu(u8 taskId)
@@ -1410,12 +1391,7 @@ static inline void ExitBuyMenu(u8 taskId)
 static void Task_BuyMenu(u8 taskId)
 {
     GridMenu_HandleInput(sShopData->gridItems);
-    if (JOY_REPEAT(DPAD_ANY))
-    {
-        DebugPrintf("Chosen item: %d", sMartInfo.itemList[GridMenu_SelectedIndex(sShopData->gridItems)]);
-        DebugPrintf("idx: %d", GridMenu_SelectedIndex(sShopData->gridItems));
-    }
-    else if (JOY_NEW(B_BUTTON))
+    if (JOY_NEW(B_BUTTON))
     {
         ExitBuyMenu(taskId);
     }
