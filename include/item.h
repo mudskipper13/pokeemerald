@@ -23,6 +23,8 @@ struct Item
     u8 battleUsage;
     ItemUseFunc battleUseFunc;
     u8 secondaryId;
+    u16 coinPrice;
+    u16 bpPrice;
 };
 
 struct BagPocket
@@ -76,6 +78,8 @@ ItemUseFunc ItemId_GetFieldFunc(u16 itemId);
 u8 ItemId_GetBattleUsage(u16 itemId);
 ItemUseFunc ItemId_GetBattleFunc(u16 itemId);
 u8 ItemId_GetSecondaryId(u16 itemId);
+u32 ItemId_GetCoinPrice(u16 itemId);
+u32 ItemId_GetBpPrice(u16 itemId);
 
 /* Expands to:
  * enum
