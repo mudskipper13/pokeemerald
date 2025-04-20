@@ -127,19 +127,24 @@ static void ExpandStringAndStartDrawFieldMessage(const u8 *str, bool32 allowSkip
 {
     if (gSpeakerName != NULL && !FlagGet(FLAG_SUPPRESS_SPEAKER_NAME))
     {
-        int strLen = GetStringWidth(FONT_SMALL, gSpeakerName, -1);
+        int strLen;
+
+        StringExpandPlaceholders(gStringVar4, gSpeakerName);
+        strLen = GetStringWidth(FONT_SMALL, gStringVar4, -1);
+
         if (strLen > 0)
         {
-            strLen = GetDialogFramePlateWidth()/2 - strLen/2;
+            strLen = GetDialogFramePlateWidth() / 2 - strLen / 2;
             gNamePlateBuffer[0] = EXT_CTRL_CODE_BEGIN;
             gNamePlateBuffer[1] = EXT_CTRL_CODE_CLEAR_TO;
             gNamePlateBuffer[2] = strLen;
-            StringExpandPlaceholders(&gNamePlateBuffer[3], gSpeakerName);
+            StringExpandPlaceholders(&gNamePlateBuffer[3], gStringVar4);
         }
         else
         {
-            StringExpandPlaceholders(&gNamePlateBuffer[0], gSpeakerName);
+            StringExpandPlaceholders(&gNamePlateBuffer[0], gStringVar4);
         }
+
         FillDialogFramePlate();
         AddTextPrinterParameterized2(1, FONT_SMALL, gNamePlateBuffer, 0, NULL, 2, 0, 3);
         PutWindowTilemap(1);
