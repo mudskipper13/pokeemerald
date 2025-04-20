@@ -47,7 +47,11 @@ InsideOfTruck_EventScript_SetIntroFlagsFemale::
 	releaseall
 	end
 
+a:
+	.string "{PLAYER}$"
+
 InsideOfTruck_EventScript_MovingBox::
+	speakername a
 	msgbox InsideOfTruck_Text_BoxPrintedWithMonLogo, MSGBOX_SIGN
 	end
 
