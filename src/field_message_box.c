@@ -38,7 +38,7 @@ static void Task_DrawFieldMessage(u8 taskId)
             DrawDialogueFrame(0, TRUE);
             if (gSpeakerName != NULL && !FlagGet(FLAG_SUPPRESS_SPEAKER_NAME))
             {
-                DrawNamePlate(1, FALSE);
+                DrawNamePlate(1, TRUE);
             }
             task->tState++;
            break;
@@ -128,6 +128,7 @@ static void ExpandStringAndStartDrawFieldMessage(const u8 *str, bool32 allowSkip
     if (gSpeakerName != NULL && !FlagGet(FLAG_SUPPRESS_SPEAKER_NAME))
     {
         int strLen;
+        const u8 colors[3] = {0, 1, 14};
 
         StringExpandPlaceholders(gStringVar4, gSpeakerName);
         strLen = GetStringWidth(FONT_SMALL, gStringVar4, -1);
@@ -146,9 +147,7 @@ static void ExpandStringAndStartDrawFieldMessage(const u8 *str, bool32 allowSkip
         }
 
         FillDialogFramePlate();
-        AddTextPrinterParameterized2(1, FONT_SMALL, gNamePlateBuffer, 0, NULL, 2, 0, 3);
-        PutWindowTilemap(1);
-        CopyWindowToVram(1, COPYWIN_FULL);
+        AddTextPrinterParameterized3(1, FONT_SMALL, 0, 0, colors, 0, gNamePlateBuffer);
     }
     StringExpandPlaceholders(gStringVar4, str);
     AddTextPrinterForMessage(allowSkippingDelayWithButtonPress);

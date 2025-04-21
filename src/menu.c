@@ -24,7 +24,7 @@
 #define DLG_WINDOW_BASE_TILE_NUM 0x200
 #define STD_WINDOW_PALETTE_NUM 14
 #define STD_WINDOW_PALETTE_SIZE PLTT_SIZEOF(10)
-#define STD_WINDOW_BASE_TILE_NUM 0x214
+#define STD_WINDOW_BASE_TILE_NUM 0x21A
 
 #define DLW_WIN_PLATE_SIZE  8
 
@@ -100,8 +100,8 @@ static const struct WindowTemplate sStandardTextBox_WindowTemplates[] =
     },
     {
         .bg = 0,
-        .tilemapLeft = 2,
-        .tilemapTop = 12,
+        .tilemapLeft = 1,
+        .tilemapTop = 13,
         .width = DLW_WIN_PLATE_SIZE,
         .height = 2,
         .paletteNum = 15,
@@ -234,18 +234,16 @@ void DrawDialogueFrame(u8 windowId, bool8 copyToVram)
     FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
     PutWindowTilemap(windowId);
     if (copyToVram == TRUE)
-        CopyWindowToVram(windowId, COPYWIN_FULL);
+        CopyBgTilemapBufferToVram(0);
 }
 
 void DrawNamePlate(u8 windowId, bool8 copyToVram)
 {
     CallWindowFunction(windowId, WindowFunc_DrawNamePlate);
-    FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
+    //FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
     PutWindowTilemap(windowId);
     if (copyToVram == TRUE)
-    {
-        CopyWindowToVram(windowId, COPYWIN_FULL);
-    }
+        CopyBgTilemapBufferToVram(0);
 }
 
 void DrawStdWindowFrame(u8 windowId, bool8 copyToVram)
@@ -358,24 +356,24 @@ static void WindowFunc_DrawDialogueFrame(u8 bg, u8 l, u8 t, u8 w, u8 h, u8 palNu
                                   sMessageBoxTilemap,
                                   0,
                                   0,
-                                  5,
+                                  9,
                                   6,
                                   l - 2,
                                   t - 1,
-                                  2,
+                                  4,
                                   6,
                                   palNum,
                                   DLG_WINDOW_BASE_TILE_NUM,
                                   0);
 
     // middle
-    for (i = l; i <= (l + w); i++)
+    for (i = (l + 1); i <= (l + w - 1); i++)
     {
         CopyRectToBgTilemapBufferRect(bg,
                                       sMessageBoxTilemap,
-                                      2,
+                                      4,
                                       0,
-                                      5,
+                                      9,
                                       6,
                                       i,
                                       t - 1,
@@ -389,13 +387,13 @@ static void WindowFunc_DrawDialogueFrame(u8 bg, u8 l, u8 t, u8 w, u8 h, u8 palNu
     // right
     CopyRectToBgTilemapBufferRect(bg,
                                   sMessageBoxTilemap,
-                                  3,
-                                  0,
                                   5,
+                                  0,
+                                  9,
                                   6,
-                                  l + w,
+                                  l + w - 2,
                                   t - 1,
-                                  2,
+                                  4,
                                   6,
                                   palNum,
                                   DLG_WINDOW_BASE_TILE_NUM,
@@ -411,29 +409,29 @@ static void WindowFunc_DrawNamePlate(u8 bg, u8 l, u8 t, u8 w, u8 h, u8 pal)
                                   sNameBoxTilemap,
                                   0,
                                   0,
-                                  3,
-                                  4,
+                                  5,
+                                  2,
                                   l - 1,
-                                  t - 1,
-                                  1,
-                                  4,
+                                  t,
+                                  2,
+                                  2,
                                   DLG_WINDOW_PALETTE_NUM,
                                   DLG_WINDOW_BASE_TILE_NUM,
                                   0);
 
     // middle
-    for (i = l; i <= (l + w); i++)
+    for (i = (l + 1); i <= (l + w - 1); i++)
     {
         CopyRectToBgTilemapBufferRect(bg,
                                       sNameBoxTilemap,
-                                      1,
+                                      2,
                                       0,
-                                      3,
-                                      4,
+                                      5,
+                                      2,
                                       i,
-                                      t - 1,
+                                      t,
                                       1,
-                                      4,
+                                      2,
                                       DLG_WINDOW_PALETTE_NUM,
                                       DLG_WINDOW_BASE_TILE_NUM,
                                       0);
@@ -442,14 +440,14 @@ static void WindowFunc_DrawNamePlate(u8 bg, u8 l, u8 t, u8 w, u8 h, u8 pal)
     // right
     CopyRectToBgTilemapBufferRect(bg,
                                   sNameBoxTilemap,
-                                  2,
-                                  0,
                                   3,
-                                  4,
-                                  l + w,
-                                  t - 1,
-                                  1,
-                                  4,
+                                  0,
+                                  5,
+                                  2,
+                                  l + w - 1,
+                                  t,
+                                  2,
+                                  2,
                                   DLG_WINDOW_PALETTE_NUM,
                                   DLG_WINDOW_BASE_TILE_NUM,
                                   0);
@@ -462,7 +460,21 @@ int GetDialogFramePlateWidth(void)
 
 void FillDialogFramePlate(void)
 {
-    FillWindowPixelBuffer(1, PIXEL_FILL(TEXT_COLOR_WHITE));
+    int i = 0;
+    u32 winSize = DLW_WIN_PLATE_SIZE;
+
+    CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[8 * 0x11], TILE_SIZE_4BPP, i);
+    CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[8 * 0x14], TILE_SIZE_4BPP, i + winSize);
+
+    for (i = 1; i < winSize; i++)
+    {
+        CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[0x8 * 0x12], TILE_SIZE_4BPP, i);
+        CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[0x8 * 0x15], TILE_SIZE_4BPP, i + winSize);
+    }
+
+    i--;
+    CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[8 * 0xE], TILE_SIZE_4BPP, i);
+    CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[8 * 0xF], TILE_SIZE_4BPP, i + winSize);
 }
 
 static void WindowFunc_ClearStdWindowAndFrame(u8 bg, u8 tilemapLeft, u8 tilemapTop, u8 width, u8 height, u8 paletteNum)

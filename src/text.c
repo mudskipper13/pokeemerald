@@ -800,9 +800,9 @@ void TextPrinterDrawDownArrow(struct TextPrinter *textPrinter)
             FillWindowPixelRect(
                 textPrinter->printerTemplate.windowId,
                 textPrinter->printerTemplate.bgColor << 4 | textPrinter->printerTemplate.bgColor,
-                ((gWindows[textPrinter->printerTemplate.windowId].window.width * 8) - 8),
+                ((gWindows[textPrinter->printerTemplate.windowId].window.width * 8) - 16),
                 ((gWindows[textPrinter->printerTemplate.windowId].window.height * 8) - 16),
-                8,
+                16,
                 16);
 
             switch (gTextFlags.useAlternateDownArrow)
@@ -821,11 +821,11 @@ void TextPrinterDrawDownArrow(struct TextPrinter *textPrinter)
                 arrowTiles,
                 0,
                 sDownArrowYCoords[subStruct->downArrowYPosIdx],
-                8,
                 16,
-                ((gWindows[textPrinter->printerTemplate.windowId].window.width * 8) - 8),
+                16,
+                ((gWindows[textPrinter->printerTemplate.windowId].window.width * 8) - 16),
                 ((gWindows[textPrinter->printerTemplate.windowId].window.height * 8) - 16),
-                8,
+                16,
                 16);
             CopyWindowToVram(textPrinter->printerTemplate.windowId, COPYWIN_GFX);
 
@@ -840,9 +840,9 @@ void TextPrinterClearDownArrow(struct TextPrinter *textPrinter)
     FillWindowPixelRect(
         textPrinter->printerTemplate.windowId,
         textPrinter->printerTemplate.bgColor << 4 | textPrinter->printerTemplate.bgColor,
-        ((gWindows[textPrinter->printerTemplate.windowId].window.width * 8) - 8),
+        ((gWindows[textPrinter->printerTemplate.windowId].window.width * 8) - 16),
         ((gWindows[textPrinter->printerTemplate.windowId].window.height * 8) - 16),
-        8,
+        16,
         16);
     CopyWindowToVram(textPrinter->printerTemplate.windowId, COPYWIN_GFX);
 }
@@ -911,9 +911,9 @@ void DrawDownArrow(u8 windowId, u16 x, u16 y, u8 bgColor, bool8 drawArrow, u8 *c
     {
         FillWindowPixelRect(windowId,
             (bgColor << 4) | bgColor,
-            ((gWindows[windowId].window.width * 8) - 8),
+            ((gWindows[windowId].window.width * 8) - 16),
             ((gWindows[windowId].window.height * 8) - 16),
-            0x8,
+            0x10,
             0x10);
         if (drawArrow == 0)
         {
@@ -933,11 +933,11 @@ void DrawDownArrow(u8 windowId, u16 x, u16 y, u8 bgColor, bool8 drawArrow, u8 *c
                 arrowTiles,
                 0,
                 sDownArrowYCoords[*yCoordIndex & 3],
-                8,
                 16,
-                ((gWindows[windowId].window.width * 8) - 8),
+                16,
+                ((gWindows[windowId].window.width * 8) - 16),
                 ((gWindows[windowId].window.height * 8) - 16),
-                8,
+                16,
                 16);
             CopyWindowToVram(windowId, COPYWIN_GFX);
             *counter = 8;
