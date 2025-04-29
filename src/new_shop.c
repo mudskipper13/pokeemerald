@@ -46,7 +46,10 @@
 
 #ifdef MUDSKIP_SHOP_UI
 
-//#include "outfit_menu.h" // Uncomment if you have mudskip's outfit system
+#ifdef MUDSKIP_OUTFIT_SYSTEM
+#include "outfit_menu.h"
+#endif
+
 #include "new_shop.h"
 
 #define GFXTAG_CURSOR 0x1300
@@ -510,7 +513,7 @@ static const struct Seller sSellers[] = {
             [SELLER_MSG_BUY_FAIL_NO_SPACE] = sText_NoMoreRoomForThis,
             [SELLER_MSG_BUY_FAIL_NO_MONEY] = sText_YouDontHaveMoney,
             [SELLER_MSG_BUY_FAIL_NO_COINS] = sText_YouDontHaveCoins,
-            [SELLER_MSG_BUY_FAIL_NO_POINTS]    = sText_YouDontHaveBP,
+            [SELLER_MSG_BUY_FAIL_NO_POINTS] = sText_YouDontHaveBP,
             [SELLER_MSG_BUY_FAIL_SOLD_OUT] = sText_ThatItemIsSoldOut,
             [SELLER_MGS_BUY_PREMIER_BONUS] = sText_ThrowInPremierBall,
             [SELLER_MSG_BUY_PREMIER_BONUS_PLURAL] = sText_ThrowInPremierBalls,
@@ -1862,9 +1865,12 @@ static void Task_ReturnToItemListAfterItemPurchase(u8 taskId)
                 ConvertIntToDecimalStringN(gStringVar1, premierBallsToAdd, STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
                 StringExpandPlaceholders(gStringVar2, str);
                 BuyMenuPrint(WIN_ITEM_DESCRIPTION, gStringVar2, 4, 0, TEXT_SKIP_DRAW, COLORID_BLACK, TRUE);
+                gTasks[taskId].func = Task_ReturnToItemListWaitMsg;
             }
-
-            gTasks[taskId].func = Task_ReturnToItemListWaitMsg;
+            else
+            {
+                gTasks[taskId].func = BuyMenuReturnToItemList;
+            }
         }
     }
     else
