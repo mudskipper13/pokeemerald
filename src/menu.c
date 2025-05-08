@@ -776,24 +776,24 @@ static void WindowFunc_DrawDialogFrameWithCustomTileAndPalette(u8 bg, u8 l, u8 t
                                   sMessageBoxTilemap,
                                   0,
                                   0,
-                                  5,
+                                  9,
                                   6,
                                   l - 2,
                                   t - 1,
-                                  2,
+                                  4,
                                   6,
                                   sPaletteNum,
                                   sTileNum,
                                   0);
 
     // middle
-    for (i = l; i <= (l + w); i++)
+    for (i = (l + 1); i <= (l + w - 1); i++)
     {
         CopyRectToBgTilemapBufferRect(bg,
                                       sMessageBoxTilemap,
-                                      2,
+                                      4,
                                       0,
-                                      5,
+                                      9,
                                       6,
                                       i,
                                       t - 1,
@@ -807,13 +807,13 @@ static void WindowFunc_DrawDialogFrameWithCustomTileAndPalette(u8 bg, u8 l, u8 t
     // right
     CopyRectToBgTilemapBufferRect(bg,
                                   sMessageBoxTilemap,
-                                  3,
-                                  0,
                                   5,
+                                  0,
+                                  9,
                                   6,
-                                  l + w,
+                                  l + w - 2,
                                   t - 1,
-                                  2,
+                                  4,
                                   6,
                                   sPaletteNum,
                                   sTileNum,
