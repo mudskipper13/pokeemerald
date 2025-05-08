@@ -355,8 +355,17 @@ void DrawDialogueFrame(u8 windowId, bool8 copyToVram)
 
 void DrawNamePlate(u8 windowId, bool8 copyToVram)
 {
+    sTileNum = DLG_WINDOW_BASE_TILE_NUM;
     CallWindowFunction(windowId, WindowFunc_DrawNamePlate);
-    //FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
+    PutWindowTilemap(windowId);
+    if (copyToVram == TRUE)
+        CopyBgTilemapBufferToVram(0);
+}
+
+void DrawNamePlateWithCustomTile(u8 windowId, bool8 copyToVram, u16 tileNum)
+{
+    sTileNum = tileNum;
+    CallWindowFunction(windowId, WindowFunc_DrawNamePlate);
     PutWindowTilemap(windowId);
     if (copyToVram == TRUE)
         CopyBgTilemapBufferToVram(0);
@@ -532,7 +541,7 @@ static void WindowFunc_DrawNamePlate(u8 bg, u8 l, u8 t, u8 w, u8 h, u8 pal)
                                   2,
                                   2,
                                   DLG_WINDOW_PALETTE_NUM,
-                                  DLG_WINDOW_BASE_TILE_NUM,
+                                  sTileNum,
                                   0);
 
     // middle
@@ -549,7 +558,7 @@ static void WindowFunc_DrawNamePlate(u8 bg, u8 l, u8 t, u8 w, u8 h, u8 pal)
                                       1,
                                       2,
                                       DLG_WINDOW_PALETTE_NUM,
-                                      DLG_WINDOW_BASE_TILE_NUM,
+                                      sTileNum,
                                       0);
     }
 
@@ -565,7 +574,7 @@ static void WindowFunc_DrawNamePlate(u8 bg, u8 l, u8 t, u8 w, u8 h, u8 pal)
                                   2,
                                   2,
                                   DLG_WINDOW_PALETTE_NUM,
-                                  DLG_WINDOW_BASE_TILE_NUM,
+                                  sTileNum,
                                   0);
 }
 
@@ -574,23 +583,23 @@ int GetDialogFramePlateWidth(void)
     return DLW_WIN_PLATE_SIZE * 8;
 }
 
-void FillDialogFramePlate(void)
+void FillDialogFramePlate(u8 windowId)
 {
     int i = 0;
     u32 winSize = DLW_WIN_PLATE_SIZE;
 
-    CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[8 * 0x11], TILE_SIZE_4BPP, i);
-    CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[8 * 0x14], TILE_SIZE_4BPP, i + winSize);
+    CopyToWindowPixelBuffer(windowId, &gMessageBox_Gfx[8 * 0x11], TILE_SIZE_4BPP, i);
+    CopyToWindowPixelBuffer(windowId, &gMessageBox_Gfx[8 * 0x14], TILE_SIZE_4BPP, i + winSize);
 
     for (i = 1; i < winSize; i++)
     {
-        CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[0x8 * 0x12], TILE_SIZE_4BPP, i);
-        CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[0x8 * 0x15], TILE_SIZE_4BPP, i + winSize);
+        CopyToWindowPixelBuffer(windowId, &gMessageBox_Gfx[0x8 * 0x12], TILE_SIZE_4BPP, i);
+        CopyToWindowPixelBuffer(windowId, &gMessageBox_Gfx[0x8 * 0x15], TILE_SIZE_4BPP, i + winSize);
     }
 
     i--;
-    CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[8 * 0xE], TILE_SIZE_4BPP, i);
-    CopyToWindowPixelBuffer(1, &gMessageBox_Gfx[8 * 0xF], TILE_SIZE_4BPP, i + winSize);
+    CopyToWindowPixelBuffer(windowId, &gMessageBox_Gfx[8 * 0xE], TILE_SIZE_4BPP, i);
+    CopyToWindowPixelBuffer(windowId, &gMessageBox_Gfx[8 * 0xF], TILE_SIZE_4BPP, i + winSize);
 }
 
 static void WindowFunc_ClearStdWindowAndFrame(u8 bg, u8 tilemapLeft, u8 tilemapTop, u8 width, u8 height, u8 paletteNum)

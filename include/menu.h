@@ -58,6 +58,7 @@ u16 RunTextPrintersAndIsPrinter0Active(void);
 void LoadMessageBoxAndBorderGfx(void);
 void DrawDialogueFrame(u8 windowId, bool8 copyToVram);
 void DrawNamePlate(u8 windowId, bool8 copyToVram);
+void DrawNamePlateWithCustomTile(u8 windowId, bool8 copyToVram, u16 tileNum);
 void ClearStdWindowAndFrame(u8 windowId, bool8 copyToVram);
 u16 AddTextPrinterParameterized2(u8 windowId, u8 fontId, const u8 *str, u8 speed, void (*callback)(struct TextPrinterTemplate *, u16), u8 fgColor, u8 bgColor, u8 shadowColor);
 void PrintPlayerNameOnWindow(u8, const u8 *, u16, u16);
@@ -139,5 +140,8 @@ u8 GetSecondaryPopUpWindowId(void);
 void RemoveSecondaryPopUpWindow(void);
 void HBlankCB_DoublePopupWindow(void);
 void DrawDialogFrameWithCustomTile(u8 windowId, bool8 copyToVram, u16 tileNum);
+
+void FillDialogFramePlate(u8 windowId);
+int GetDialogFramePlateWidth();
 
 #endif // GUARD_MENU_H
