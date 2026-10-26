@@ -1,7 +1,10 @@
 #include "global.h"
+#include "gpu_regs.h"
 #include "decompress.h"
 #include "sprite.h"
 #include "script.h"
+#include "overworld.h"
+#include "battle_pyramid.h"
 #include "event_data.h"
 #include "field_weather.h"
 #include "field_message_box.h"
@@ -9,7 +12,14 @@
 #include "constants/field_mugshots.h"
 #include "data/field_mugshots.h"
 
-static EWRAM_DATA u8 sFieldMugshotSpriteIds[2] = {};
+enum MugshotSlots {
+    MUGSHOT_SLOT_0,
+    MUGSHOT_SLOT_1,
+    MUGSHOT_SLOT_WINDOW,
+    NUM_MUGSHOT_SLOTS
+};
+
+static EWRAM_DATA u8 sFieldMugshotSpriteIds[NUM_MUGSHOT_SLOTS] = {};
 static EWRAM_DATA u8 sIsFieldMugshotActive = 0;
 static EWRAM_DATA u8 sFieldMugshotSlot = 0;
 
@@ -40,32 +50,42 @@ static const struct SpriteTemplate sFieldMugshot_SpriteTemplate = {
 
 static void SpriteCB_FieldMugshot(struct Sprite *s)
 {
+    u32 winSpriteId = s->data[1];
     if (s->data[0] == TRUE)
     {
         s->invisible = FALSE;
+        if (winSpriteId != 0xFF)
+            gSprites[winSpriteId].invisible = FALSE;
     }
     else
     {
         s->invisible = TRUE;
+        if (winSpriteId != 0xFF)
+            gSprites[winSpriteId].invisible = TRUE;
     }
 }
 
 void RemoveFieldMugshot(void)
 {
     ResetPreservedPalettesInWeather();
-    if (sFieldMugshotSpriteIds[0] != 0xFF)
+    if (sFieldMugshotSpriteIds[MUGSHOT_SLOT_WINDOW] != 0xFF)
+    {
+        DestroySprite(&gSprites[sFieldMugshotSpriteIds[MUGSHOT_SLOT_WINDOW]]);
+        sFieldMugshotSpriteIds[MUGSHOT_SLOT_WINDOW] = SPRITE_NONE;
+    }
+    if (sFieldMugshotSpriteIds[MUGSHOT_SLOT_0] != 0xFF)
     {
         FreeSpriteTilesByTag(TAG_MUGSHOT);
         FreeSpritePaletteByTag(TAG_MUGSHOT);
-        DestroySprite(&gSprites[sFieldMugshotSpriteIds[0]]);
-        sFieldMugshotSpriteIds[0] = SPRITE_NONE;
+        DestroySprite(&gSprites[sFieldMugshotSpriteIds[MUGSHOT_SLOT_0]]);
+        sFieldMugshotSpriteIds[MUGSHOT_SLOT_0] = SPRITE_NONE;
     }
-    if (sFieldMugshotSpriteIds[1] != 0xFF)
+    if (sFieldMugshotSpriteIds[MUGSHOT_SLOT_1] != 0xFF)
     {
         FreeSpriteTilesByTag(TAG_MUGSHOT2);
         FreeSpritePaletteByTag(TAG_MUGSHOT2);
-        DestroySprite(&gSprites[sFieldMugshotSpriteIds[1]]);
-        sFieldMugshotSpriteIds[1] = SPRITE_NONE;
+        DestroySprite(&gSprites[sFieldMugshotSpriteIds[MUGSHOT_SLOT_1]]);
+        sFieldMugshotSpriteIds[MUGSHOT_SLOT_1] = SPRITE_NONE;
     }
     sIsFieldMugshotActive = FALSE;
 }
@@ -102,10 +122,18 @@ void _CreateFieldMugshot(u32 id, u32 emote)
     struct SpriteTemplate temp = sFieldMugshot_SpriteTemplate;
     struct CompressedSpriteSheet sheet = { .size=0x1000, .tag=slot+TAG_MUGSHOT };
     struct SpritePalette pal = { .tag = sheet.tag };
+    bool32 flash = GetFlashLevel() > 0 || InBattlePyramid_();
 
-    DebugPrintf("id: %u, emote: %u, sFieldMugshotSlot: %u, NULL: %d", id, emote, slot, sFieldMugshots[id][emote].gfx == NULL);
+    if (flash)
+    {
+        SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_OBJWIN_ON);
+        SetGpuRegBits(REG_OFFSET_WINOUT, WINOUT_WINOBJ_OBJ);
+    }
+
     if (sIsFieldMugshotActive)
     {
+        if (sFieldMugshotSpriteIds[MUGSHOT_SLOT_WINDOW] != 0xFF)
+            DestroySprite(&gSprites[sFieldMugshotSpriteIds[MUGSHOT_SLOT_WINDOW]]);
         _RemoveFieldMugshot(slot);
     }
 
@@ -127,6 +155,20 @@ void _CreateFieldMugshot(u32 id, u32 emote)
     {
         return;
     }
+
+    gSprites[sFieldMugshotSpriteIds[slot]].data[1] = 0xFF;
+    if (flash)
+    {
+        u32 spriteId = CreateSprite(&temp, MUGSHOT_X, MUGSHOT_Y, 0);
+        if (spriteId != 0xFF)
+        {
+            gSprites[spriteId].callback = SpriteCallbackDummy;
+            gSprites[spriteId].oam.objMode = ST_OAM_OBJ_WINDOW;
+            sFieldMugshotSpriteIds[MUGSHOT_SLOT_WINDOW] = spriteId;
+            gSprites[sFieldMugshotSpriteIds[slot]].data[1] = spriteId;
+        }
+    }
+
     PreservePaletteInWeather(gSprites[sFieldMugshotSpriteIds[slot]].oam.paletteNum + 0x10);
     gSprites[sFieldMugshotSpriteIds[slot]].data[0] = FALSE;
     sIsFieldMugshotActive = TRUE;
@@ -145,6 +187,7 @@ u8 IsFieldMugshotActive(void)
 
 void SetFieldMugshotSpriteId(u32 value)
 {
-    sFieldMugshotSpriteIds[0] = value;
-    sFieldMugshotSpriteIds[1] = value;
+    sFieldMugshotSpriteIds[MUGSHOT_SLOT_0] = value;
+    sFieldMugshotSpriteIds[MUGSHOT_SLOT_1] = value;
+    sFieldMugshotSpriteIds[MUGSHOT_SLOT_WINDOW] = value;
 }
